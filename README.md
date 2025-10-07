@@ -78,4 +78,20 @@ compact: x86_64-unknown-linux-musl -- 0.25.0 -- default.
 0.25.0
 ```
 
+Cloned the example repository as described in [the official documentation](https://docs.midnight.network/develop/tutorial/building/examples-repo)
+
+It says "You will be using Yarn" but the following tutorial documents are using npm, so I decided to use npm.
+
+### Build the counter DApp
+
+https://docs.midnight.network/develop/tutorial/building/counter-build
+
+**Note:** The official documentation instructs to run `npm run compile` in the `contract` folder, but there is no `compile` script defined.  
+Instead, use the following command to compile and test the contract:
+
+```
+npm run compact && npm run build
+```
+
+
 
