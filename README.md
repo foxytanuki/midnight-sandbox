@@ -52,3 +52,30 @@ Run proof-server:
 docker run -p 6300:6300 midnightnetwork/proof-server -- 'midnight-proof-server --network testnet'
 ```
 
+## Build a DApp
+
+```
+❯ node -v
+v22.15.1
+```
+
+Install the developer tools
+
+```
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+```
+
+Update
+
+```
+❯ compact update
+compact: x86_64-unknown-linux-musl -- 0.25.0 -- installed
+compact: x86_64-unknown-linux-musl -- 0.25.0 -- default.
+```
+
+```
+❯ compact compile --version
+0.25.0
+```
+
+
