@@ -229,7 +229,8 @@ pnpm run dev -- search-account --help
 
 ## ドキュメント
 
-詳細なRPC APIリファレンスについては、[RPC_API.md](./RPC_API.md)を参照してください。
+* [RPC_API.md](./RPC_API.md) - 詳細なRPC APIリファレンス
+* [INDEXER.md](./INDEXER.md) - Midnight Network Indexerについて
 
 ## ライセンス
 
