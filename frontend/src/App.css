@@ -72,6 +72,35 @@ body {
 	padding: 1rem;
 }
 
+.tabs {
+	display: flex;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+	border-bottom: 1px solid #e0e0e0;
+	padding-bottom: 0.5rem;
+}
+
+.tab-button {
+	padding: 0.5rem 1rem;
+	border: none;
+	background-color: transparent;
+	color: #666;
+	cursor: pointer;
+	font-size: 0.9rem;
+	border-radius: 4px;
+	transition: all 0.2s;
+}
+
+.tab-button:hover {
+	background-color: #f8f9fa;
+	color: #333;
+}
+
+.tab-button.active {
+	background-color: #007bff;
+	color: white;
+}
+
 .sidebar h2 {
 	font-size: 1.2rem;
 	margin-bottom: 1rem;

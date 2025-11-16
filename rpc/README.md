@@ -182,6 +182,32 @@ pnpm run dev -- midnight_apiVersions
 pnpm run dev -- midnight_jsonContractState --address "your_contract_address"
 ```
 
+### トランザクション検索
+
+```bash
+# トランザクションハッシュで検索
+pnpm run dev -- search-tx <transaction_hash>
+
+# ブロック範囲を指定して検索
+pnpm run dev -- search-tx <transaction_hash> --startBlock 1000 --endBlock 2000
+
+# 最大検索ブロック数を指定
+pnpm run dev -- search-tx <transaction_hash> --maxBlocks 500
+```
+
+### アカウントアドレスでトランザクション検索
+
+```bash
+# アカウントアドレスに関連するトランザクションを検索
+pnpm run dev -- search-account <account_address>
+
+# ブロック範囲を指定して検索
+pnpm run dev -- search-account <account_address> --startBlock 1000 --endBlock 2000
+
+# 最大検索ブロック数を指定（デフォルト: 100）
+pnpm run dev -- search-account <account_address> --maxBlocks 200
+```
+
 ### カスタムエンドポイントを使用
 
 ```bash
@@ -197,6 +223,8 @@ pnpm run dev --help
 # 特定のメソッドのヘルプ
 pnpm run dev -- system_chain --help
 pnpm run dev -- midnight_jsonContractState --help
+pnpm run dev -- search-tx --help
+pnpm run dev -- search-account --help
 ```
 
 ## ドキュメント

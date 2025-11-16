@@ -1,5 +1,10 @@
 import { useState } from "react";
 import { RpcClient } from "./rpc-client";
+import {
+	searchTransactionByHash,
+	searchTransactionsByAccount,
+	type TransactionSearchResult,
+} from "./tx-search";
 import "./App.css";
 
 const DEFAULT_ENDPOINT = "https://rpc.testnet-02.midnight.network/";
@@ -113,13 +118,26 @@ const RPC_METHODS: RpcMethod[] = [
 	},
 ];
 
+type TabType = "rpc" | "search-tx" | "search-account";
+
 function App() {
 	const [endpoint, setEndpoint] = useState(DEFAULT_ENDPOINT);
+	const [activeTab, setActiveTab] = useState<TabType>("rpc");
 	const [selectedMethod, setSelectedMethod] = useState<string>("system_chain");
 	const [params, setParams] = useState<Record<string, string>>({});
 	const [result, setResult] = useState<string>("");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState<string>("");
+
+	// Transaction search states
+	const [txHash, setTxHash] = useState<string>("");
+	const [accountAddress, setAccountAddress] = useState<string>("");
+	const [searchStartBlock, setSearchStartBlock] = useState<string>("");
+	const [searchEndBlock, setSearchEndBlock] = useState<string>("");
+	const [maxBlocks, setMaxBlocks] = useState<string>("");
+	const [searchResults, setSearchResults] = useState<
+		TransactionSearchResult | TransactionSearchResult[] | null
+	>(null);
 
 	const client = new RpcClient({ endpoint, timeout: 30000 });
 
@@ -169,6 +187,68 @@ function App() {
 		}
 	};
 
+	const handleSearchTx = async () => {
+		if (!txHash.trim()) {
+			setError("トランザクションハッシュを入力してください");
+			return;
+		}
+
+		setLoading(true);
+		setError("");
+		setSearchResults(null);
+
+		try {
+			const result = await searchTransactionByHash(client, txHash, {
+				startBlock: searchStartBlock
+					? parseInt(searchStartBlock, 10)
+					: undefined,
+				endBlock: searchEndBlock ? parseInt(searchEndBlock, 10) : undefined,
+				maxBlocks: maxBlocks ? parseInt(maxBlocks, 10) : undefined,
+			});
+
+			if (result) {
+				setSearchResults(result);
+			} else {
+				setError("トランザクションが見つかりませんでした");
+			}
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Unknown error occurred");
+		} finally {
+			setLoading(false);
+		}
+	};
+
+	const handleSearchAccount = async () => {
+		if (!accountAddress.trim()) {
+			setError("アカウントアドレスを入力してください");
+			return;
+		}
+
+		setLoading(true);
+		setError("");
+		setSearchResults(null);
+
+		try {
+			const results = await searchTransactionsByAccount(
+				client,
+				accountAddress,
+				{
+					startBlock: searchStartBlock
+						? parseInt(searchStartBlock, 10)
+						: undefined,
+					endBlock: searchEndBlock ? parseInt(searchEndBlock, 10) : undefined,
+					maxBlocks: maxBlocks ? parseInt(maxBlocks, 10) : undefined,
+				},
+			);
+
+			setSearchResults(results);
+		} catch (err) {
+			setError(err instanceof Error ? err.message : "Unknown error occurred");
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	return (
 		<div className="app">
 			<header className="header">
@@ -188,77 +268,277 @@ function App() {
 
 			<main className="main">
 				<div className="sidebar">
-					<h2>RPC Methods</h2>
-					<div className="method-list">
-						{RPC_METHODS.map((method) => (
-							<button
-								type="button"
-								key={method.name}
-								onClick={() => handleMethodChange(method.name)}
-								className={`method-button ${
-									selectedMethod === method.name ? "active" : ""
-								}`}
-							>
-								<div className="method-name">{method.name}</div>
-								<div className="method-description">{method.description}</div>
-							</button>
-						))}
+					<div className="tabs">
+						<button
+							type="button"
+							className={`tab-button ${activeTab === "rpc" ? "active" : ""}`}
+							onClick={() => setActiveTab("rpc")}
+						>
+							RPC Methods
+						</button>
+						<button
+							type="button"
+							className={`tab-button ${
+								activeTab === "search-tx" ? "active" : ""
+							}`}
+							onClick={() => setActiveTab("search-tx")}
+						>
+							Search TX
+						</button>
+						<button
+							type="button"
+							className={`tab-button ${
+								activeTab === "search-account" ? "active" : ""
+							}`}
+							onClick={() => setActiveTab("search-account")}
+						>
+							Search Account
+						</button>
 					</div>
+
+					{activeTab === "rpc" && (
+						<>
+							<h2>RPC Methods</h2>
+							<div className="method-list">
+								{RPC_METHODS.map((method) => (
+									<button
+										type="button"
+										key={method.name}
+										onClick={() => handleMethodChange(method.name)}
+										className={`method-button ${
+											selectedMethod === method.name ? "active" : ""
+										}`}
+									>
+										<div className="method-name">{method.name}</div>
+										<div className="method-description">
+											{method.description}
+										</div>
+									</button>
+								))}
+							</div>
+						</>
+					)}
 				</div>
 
 				<div className="content">
-					<div className="method-panel">
-						<h2>{selectedMethod}</h2>
-						<p className="method-description-text">
-							{selectedMethodInfo?.description}
-						</p>
+					{activeTab === "rpc" && (
+						<div className="method-panel">
+							<h2>{selectedMethod}</h2>
+							<p className="method-description-text">
+								{selectedMethodInfo?.description}
+							</p>
 
-						{selectedMethodInfo?.params &&
-							selectedMethodInfo.params.length > 0 && (
-								<div className="params-section">
-									<h3>Parameters</h3>
-									{selectedMethodInfo.params.map((param) => (
-										<div key={param.name} className="param-input">
-											<label>
-												{param.name} ({param.type})
-												{param.required && <span className="required">*</span>}
-												<input
-													type="text"
-													value={params[param.name] || ""}
-													onChange={(e) =>
-														handleParamChange(param.name, e.target.value)
-													}
-													placeholder={param.required ? "Required" : "Optional"}
-												/>
-											</label>
-										</div>
-									))}
+							{selectedMethodInfo?.params &&
+								selectedMethodInfo.params.length > 0 && (
+									<div className="params-section">
+										<h3>Parameters</h3>
+										{selectedMethodInfo.params.map((param) => (
+											<div key={param.name} className="param-input">
+												<label>
+													{param.name} ({param.type})
+													{param.required && (
+														<span className="required">*</span>
+													)}
+													<input
+														type="text"
+														value={params[param.name] || ""}
+														onChange={(e) =>
+															handleParamChange(param.name, e.target.value)
+														}
+														placeholder={
+															param.required ? "Required" : "Optional"
+														}
+													/>
+												</label>
+											</div>
+										))}
+									</div>
+								)}
+
+							<button
+								type="button"
+								onClick={handleCall}
+								disabled={loading}
+								className="call-button"
+							>
+								{loading ? "Calling..." : "Call RPC Method"}
+							</button>
+
+							{error && (
+								<div className="error-panel">
+									<h3>Error</h3>
+									<pre>{error}</pre>
 								</div>
 							)}
 
-						<button
-							type="button"
-							onClick={handleCall}
-							disabled={loading}
-							className="call-button"
-						>
-							{loading ? "Calling..." : "Call RPC Method"}
-						</button>
+							{result && (
+								<div className="result-panel">
+									<h3>Result</h3>
+									<pre>{result}</pre>
+								</div>
+							)}
+						</div>
+					)}
 
-						{error && (
-							<div className="error-panel">
-								<h3>Error</h3>
-								<pre>{error}</pre>
-							</div>
-						)}
+					{activeTab === "search-tx" && (
+						<div className="method-panel">
+							<h2>トランザクションハッシュで検索</h2>
+							<p className="method-description-text">
+								トランザクションハッシュを入力して、トランザクションを検索します。
+							</p>
 
-						{result && (
-							<div className="result-panel">
-								<h3>Result</h3>
-								<pre>{result}</pre>
+							<div className="params-section">
+								<div className="param-input">
+									<label>
+										トランザクションハッシュ
+										<span className="required">*</span>
+										<input
+											type="text"
+											value={txHash}
+											onChange={(e) => setTxHash(e.target.value)}
+											placeholder="0x..."
+										/>
+									</label>
+								</div>
+								<div className="param-input">
+									<label>
+										検索開始ブロック番号（オプション）
+										<input
+											type="number"
+											value={searchStartBlock}
+											onChange={(e) => setSearchStartBlock(e.target.value)}
+											placeholder="例: 1000"
+										/>
+									</label>
+								</div>
+								<div className="param-input">
+									<label>
+										検索終了ブロック番号（オプション）
+										<input
+											type="number"
+											value={searchEndBlock}
+											onChange={(e) => setSearchEndBlock(e.target.value)}
+											placeholder="例: 2000"
+										/>
+									</label>
+								</div>
+								<div className="param-input">
+									<label>
+										最大検索ブロック数（デフォルト: 1000）
+										<input
+											type="number"
+											value={maxBlocks}
+											onChange={(e) => setMaxBlocks(e.target.value)}
+											placeholder="1000"
+										/>
+									</label>
+								</div>
 							</div>
-						)}
-					</div>
+
+							<button
+								type="button"
+								onClick={handleSearchTx}
+								disabled={loading}
+								className="call-button"
+							>
+								{loading ? "検索中..." : "検索"}
+							</button>
+
+							{error && (
+								<div className="error-panel">
+									<h3>Error</h3>
+									<pre>{error}</pre>
+								</div>
+							)}
+
+							{searchResults && (
+								<div className="result-panel">
+									<h3>検索結果</h3>
+									<pre>{JSON.stringify(searchResults, null, 2)}</pre>
+								</div>
+							)}
+						</div>
+					)}
+
+					{activeTab === "search-account" && (
+						<div className="method-panel">
+							<h2>アカウントアドレスで検索</h2>
+							<p className="method-description-text">
+								アカウントアドレスを入力して、関連するトランザクションを検索します。
+							</p>
+
+							<div className="params-section">
+								<div className="param-input">
+									<label>
+										アカウントアドレス
+										<span className="required">*</span>
+										<input
+											type="text"
+											value={accountAddress}
+											onChange={(e) => setAccountAddress(e.target.value)}
+											placeholder="mn_shield-addr_..."
+										/>
+									</label>
+								</div>
+								<div className="param-input">
+									<label>
+										検索開始ブロック番号（オプション）
+										<input
+											type="number"
+											value={searchStartBlock}
+											onChange={(e) => setSearchStartBlock(e.target.value)}
+											placeholder="例: 1000"
+										/>
+									</label>
+								</div>
+								<div className="param-input">
+									<label>
+										検索終了ブロック番号（オプション）
+										<input
+											type="number"
+											value={searchEndBlock}
+											onChange={(e) => setSearchEndBlock(e.target.value)}
+											placeholder="例: 2000"
+										/>
+									</label>
+								</div>
+								<div className="param-input">
+									<label>
+										最大検索ブロック数（デフォルト: 100）
+										<input
+											type="number"
+											value={maxBlocks}
+											onChange={(e) => setMaxBlocks(e.target.value)}
+											placeholder="100"
+										/>
+									</label>
+								</div>
+							</div>
+
+							<button
+								type="button"
+								onClick={handleSearchAccount}
+								disabled={loading}
+								className="call-button"
+							>
+								{loading ? "検索中..." : "検索"}
+							</button>
+
+							{error && (
+								<div className="error-panel">
+									<h3>Error</h3>
+									<pre>{error}</pre>
+								</div>
+							)}
+
+							{searchResults && Array.isArray(searchResults) && (
+								<div className="result-panel">
+									<h3>検索結果 ({searchResults.length}件)</h3>
+									<pre>{JSON.stringify(searchResults, null, 2)}</pre>
+								</div>
+							)}
+						</div>
+					)}
 				</div>
 			</main>
 		</div>
