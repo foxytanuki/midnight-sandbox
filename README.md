@@ -93,7 +93,7 @@ Instead, use the following command to compile and test the contract:
 npm run compact && npm run build
 ```
 
---
+---
 
 ```
 curl -X POST \
