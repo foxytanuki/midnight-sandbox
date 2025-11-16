@@ -58,12 +58,14 @@ Midnight NetworkはPolkadot RPC標準に準拠しており、以下のカテゴ�
 
 ブロックチェーンの状態とブロック情報を取得するメソッド。
 
-* `chain_getBlock(hash?: BlockHash)`: ブロックのヘッダーとボディを取得
+* `chain_getBlock(hash?: BlockHash)`: ブロックのヘッダーとボディを取得（ブロック内のextrinsicを含む）
 * `chain_getBlockHash(blockNumber?: BlockNumber)`: 特定のブロックのハッシュを取得
 * `chain_getFinalizedHead()`: 最終確定されたブロックのハッシュを取得
 * `chain_getHeader(hash?: BlockHash)`: 特定のブロックのヘッダーを取得
 * `chain_subscribeNewHeads()`: 新しいブロックヘッダーを購読
 * `chain_subscribeFinalizedHeads()`: 最終確定されたブロックヘッダーを購読
+
+**注意**: Polkadot/Substrateでは、Ethereumのような直接のトランザクションハッシュ検索メソッドは標準RPCに含まれていません。トランザクション（extrinsic）はブロック内に含まれるため、`chain_getBlock`でブロックを取得し、その中のextrinsicを検索する必要があります。
 
 ### state
 
@@ -261,6 +263,123 @@ ZSwapチェーンの状態を取得します。ゼロ知識状態ロールアッ
   "id": 1
 }
 ```
+
+### midnight\_jsonBlock
+
+JSONエンコードされたブロック情報を取得します。ブロック内のextrinsic（トランザクション）を含みます。
+
+**メソッド名**: `midnight_jsonBlock`
+
+**パラメータ**:
+
+* `at: Option<BlockHash>` - ブロックハッシュ（オプション、指定しない場合は最新ブロック）
+
+**戻り値**: `String` - JSONエンコードされたブロック情報
+
+**エラー**: `BlockRpcError`
+
+**例**:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "midnight_jsonBlock",
+  "params": [],
+  "id": 1
+}
+```
+
+**注意**: このメソッドを使用してブロックを取得し、その中のextrinsicを検索することで、トランザクション（extrinsic）を検索できます。
+
+### midnight\_decodeEvents
+
+イベントをデコードします。
+
+**メソッド名**: `midnight_decodeEvents`
+
+**パラメータ**:
+
+* `events: String` - エンコードされたイベントデータ
+
+**戻り値**: `String` - デコードされたイベント情報
+
+**エラー**: `StateRpcError`
+
+**例**:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "midnight_decodeEvents",
+  "params": ["encoded_events_here"],
+  "id": 1
+}
+```
+
+### midnight\_zswapStateRoot
+
+ZSwap状態ルートを取得します。
+
+**メソッド名**: `midnight_zswapStateRoot`
+
+**パラメータ**:
+
+* `at: Option<BlockHash>` - ブロックハッシュ（オプション、指定しない場合は最新ブロック）
+
+**戻り値**: `String` - ZSwap状態ルート
+
+**エラー**: `StateRpcError`
+
+**例**:
+
+```json
+{
+  "jsonrpc": "2.0",
+  "method": "midnight_zswapStateRoot",
+  "params": [],
+  "id": 1
+}
+```
+
+## トランザクション（Extrinsic）の検索について
+
+Polkadot/Substrateでは、Ethereumのような直接のトランザクションハッシュ検索メソッドは標準RPCに含まれていません。これは、SubstrateのアーキテクチャがEthereumとは異なるためです。
+
+### トランザクションを検索する方法
+
+1. **ブロックを取得してextrinsicを検索**: `chain_getBlock`または`midnight_jsonBlock`でブロックを取得し、その中のextrinsicを検索します。
+
+2. **ブロック範囲を検索**: 複数のブロックを順次取得し、各ブロック内のextrinsicを検索します。
+
+3. **Indexerを使用**: Midnight Networkのindexerを使用してトランザクションを検索する方法もあります。
+
+### 実装例
+
+```bash
+# 1. 最新ブロックを取得
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "midnight_jsonBlock",
+    "params": [],
+    "id": 1
+  }' \
+  https://rpc.testnet-02.midnight.network/
+
+# 2. 特定のブロックを取得
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc": "2.0",
+    "method": "chain_getBlock",
+    "params": ["block_hash_here"],
+    "id": 1
+  }' \
+  https://rpc.testnet-02.midnight.network/
+```
+
+取得したブロックの`extrinsics`フィールドに、そのブロックに含まれるすべてのextrinsic（トランザクション）が含まれています。
 
 ## 使用例
 

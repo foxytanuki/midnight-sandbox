@@ -96,6 +96,21 @@ const RPC_METHODS: RpcMethod[] = [
 		description: "レジャーバージョンを取得",
 		params: [{ name: "at", type: "string", required: false }],
 	},
+	{
+		name: "midnight_jsonBlock",
+		description: "JSONエンコードされたブロック情報を取得（extrinsicを含む）",
+		params: [{ name: "at", type: "string", required: false }],
+	},
+	{
+		name: "midnight_decodeEvents",
+		description: "イベントをデコード",
+		params: [{ name: "events", type: "string", required: true }],
+	},
+	{
+		name: "midnight_zswapStateRoot",
+		description: "ZSwap状態ルートを取得",
+		params: [{ name: "at", type: "string", required: false }],
+	},
 ];
 
 function App() {

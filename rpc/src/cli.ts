@@ -300,6 +300,48 @@ function main() {
 			],
 		}
 	);
+	createRpcCommand(
+		program,
+		"midnight_jsonBlock",
+		"JSONエンコードされたブロック情報を取得（extrinsicを含む）",
+		{
+			options: [
+				{
+					flags: "-a, --at <hash>",
+					description: "ブロックハッシュ（オプション）",
+					required: false,
+				},
+			],
+		}
+	);
+	createRpcCommand(
+		program,
+		"midnight_decodeEvents",
+		"イベントをデコード",
+		{
+			options: [
+				{
+					flags: "-e, --events <events>",
+					description: "エンコードされたイベントデータ",
+					required: true,
+				},
+			],
+		}
+	);
+	createRpcCommand(
+		program,
+		"midnight_zswapStateRoot",
+		"ZSwap状態ルートを取得",
+		{
+			options: [
+				{
+					flags: "-a, --at <hash>",
+					description: "ブロックハッシュ（オプション）",
+					required: false,
+				},
+			],
+		}
+	);
 
 	// カスタムRPCコール
 	program
