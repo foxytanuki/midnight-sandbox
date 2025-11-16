@@ -93,5 +93,19 @@ Instead, use the following command to compile and test the contract:
 npm run compact && npm run build
 ```
 
+---
+
+```
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -d '{
+        "jsonrpc": "2.0",
+        "method": "system_chain",
+        "params": [],
+        "id": 1
+      }' \
+  https://rpc.testnet-02.midnight.network/
+```
+
 
 
