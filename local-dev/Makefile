@@ -4,7 +4,7 @@
 .DEFAULT_GOAL := help
 
 # 環境変数
-COMPOSE_FILE := docker-compose.yml
+COMPOSE_FILE := compose.yaml
 
 ##@ 基本操作
 

@@ -4,7 +4,7 @@
 services:
   # Midnight Node - ブロックチェーンノード
   node:
-    image: midnightntwrk/midnight-node:latest
+    image: midnightntwrk/midnight-node:latest-main
     container_name: midnight-node
     ports:
       - "9944:9944"   # WebSocket RPC
@@ -25,7 +25,7 @@ services:
 
   # Indexer - GraphQL API for querying chain state
   indexer:
-    image: midnightntwrk/indexer-standalone:latest
+    image: midnightntwrk/indexer-standalone:3.0.0-alpha.20
     container_name: midnight-indexer
     ports:
       - "8088:8088"
@@ -42,7 +42,7 @@ services:
 
   # Proof Server - ZK proof generation
   proof-server:
-    image: midnightntwrk/proof-server:latest
+    image: midnightnetwork/proof-server:latest
     container_name: midnight-proof-server
     ports:
       - "6300:6300"
