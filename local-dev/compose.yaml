@@ -12,6 +12,9 @@ services:
     environment:
       CFG_PRESET: dev
       RUST_LOG: info
+      BASE_PATH: /data
+    volumes:
+      - node-data:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9944/health"]
       interval: 5s
@@ -30,6 +33,8 @@ services:
       RUST_LOG: info
       APP__INFRA__NODE__URL: ws://node:9944
       APP__INFRA__SECRET: "303132333435363738393031323334353637383930313233343536373839303132"
+    volumes:
+      - indexer-data:/data
     depends_on:
       node:
         condition: service_healthy
@@ -52,4 +57,5 @@ networks:
 
 volumes:
   node-data:
+  indexer-data:
 
