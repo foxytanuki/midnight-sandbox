@@ -19,3 +19,18 @@
 [submodule "midnight-zk"]
 	path = submodules/midnight-zk
 	url = https://github.com/midnightntwrk/midnight-zk.git
+[submodule "submodules/midnight-docs"]
+	path = submodules/midnight-docs
+	url = https://github.com/midnightntwrk/midnight-docs.git
+[submodule "submodules/example-counter"]
+	path = submodules/example-counter
+	url = https://github.com/midnightntwrk/example-counter.git
+[submodule "submodules/example-bboard"]
+	path = submodules/example-bboard
+	url = https://github.com/midnightntwrk/example-bboard.git
+[submodule "submodules/midnight-dapp-connector-api"]
+	path = submodules/midnight-dapp-connector-api
+	url = https://github.com/midnightntwrk/midnight-dapp-connector-api.git
+[submodule "submodules/midnight-trusted-setup"]
+	path = submodules/midnight-trusted-setup
+	url = https://github.com/midnightntwrk/midnight-trusted-setup.git
