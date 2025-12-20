@@ -1,0 +1,31 @@
+{
+  "name": "counter-dapp",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "deploy": "node dist/deploy.js"
+  },
+  "dependencies": {
+    "@midnight-ntwrk/compact-runtime": "latest",
+    "@midnight-ntwrk/ledger": "latest",
+    "@midnight-ntwrk/midnight-js-contracts": "latest",
+    "@midnight-ntwrk/midnight-js-http-client-proof-provider": "latest",
+    "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "latest",
+    "@midnight-ntwrk/midnight-js-level-private-state-provider": "latest",
+    "@midnight-ntwrk/midnight-js-node-zk-config-provider": "latest",
+    "@midnight-ntwrk/midnight-js-network-id": "latest",
+    "@midnight-ntwrk/midnight-js-types": "latest",
+    "@midnight-ntwrk/wallet": "latest",
+    "@midnight-ntwrk/wallet-api": "latest",
+    "@midnight-ntwrk/zswap": "latest",
+    "rxjs": "latest",
+    "ws": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/ws": "latest",
+    "typescript": "latest"
+  }
+}
+
