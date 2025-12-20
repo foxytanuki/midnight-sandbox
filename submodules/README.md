@@ -8,11 +8,13 @@ Midnight ブロックチェーンを構成する各コンポーネントのサ�
 graph TB
     subgraph "Application Layer"
         dapp[dApp]
+        examples[Examples]
     end
 
     subgraph "SDK Layer"
         js[midnight-js]
         wallet[midnight-wallet]
+        connector[dapp-connector-api]
     end
 
     subgraph "Infrastructure Layer"
@@ -23,15 +25,22 @@ graph TB
     subgraph "Core Library Layer"
         ledger[midnight-ledger]
         zk[midnight-zk]
+        trusted[trusted-setup]
     end
 
     subgraph "Foundation Layer"
         partner[partner-chains]
     end
 
+    subgraph "Documentation"
+        docs[midnight-docs]
+    end
+
     %% Application → SDK
     dapp --> js
     dapp --> wallet
+    dapp --> connector
+    examples --> js
 
     %% SDK → Infrastructure
     js --> indexer
@@ -46,6 +55,7 @@ graph TB
 
     %% Core dependencies
     ledger --> zk
+    zk -.-> trusted
 
     %% SDK → Core (WASM bindings)
     js -.-> ledger
@@ -58,6 +68,8 @@ graph TB
 
 ## リポジトリ概要
 
+### コアコンポーネント
+
 | リポジトリ | 言語 | 概要 |
 |-----------|------|------|
 | [midnight-node](#midnight-node) | Rust | ブロックチェーンノード実装 |
@@ -67,6 +79,16 @@ graph TB
 | [midnight-wallet](#midnight-wallet) | TypeScript | ウォレットSDK |
 | [midnight-js](#midnight-js) | TypeScript | dApp開発フレームワーク |
 | [partner-chains](#partner-chains) | Rust | Cardano Partner Chain ノード |
+
+### 追加リソース
+
+| リポジトリ | 言語 | 概要 |
+|-----------|------|------|
+| [midnight-docs](#midnight-docs) | MDX | 公式ドキュメント |
+| [example-counter](#example-counter) | TypeScript | カウンターサンプル |
+| [example-bboard](#example-bboard) | TypeScript | 掲示板サンプル (React UI) |
+| [midnight-dapp-connector-api](#midnight-dapp-connector-api) | TypeScript | dApp コネクタ API |
+| [midnight-trusted-setup](#midnight-trusted-setup) | Rust | Trusted Setup セレモニー |
 
 ---
 
@@ -156,8 +178,64 @@ Cardano Partner Chain 向けの Substrate ベースノード。サイドチェ�
 
 ---
 
+## midnight-docs
+
+Midnight の公式ドキュメントソース。MDX 形式で記述されており、https://docs.midnight.network/ で公開されている。
+
+**内容:**
+- Getting Started ガイド
+- Compact 言語リファレンス
+- SDK ドキュメント
+- API リファレンス
+
+---
+
+## example-counter
+
+シンプルなカウンターコントラクトのサンプルプロジェクト。Compact コントラクトと CLI 環境を提供する。
+
+**学習ポイント:**
+- 基本的な Compact 構文
+- コントラクトのデプロイ
+- circuit の呼び出し
+
+---
+
+## example-bboard
+
+掲示板 dApp のサンプルプロジェクト。React UI 付きで、実践的な dApp 開発パターンを学べる。
+
+**学習ポイント:**
+- React との統合
+- プライベート状態の管理
+- リアルタイム更新
+
+---
+
+## midnight-dapp-connector-api
+
+dApp とウォレットソフトウェア間の通信を可能にする API。データアクセスとセキュリティを制御しながら相互作用を実現する。
+
+**主要機能:**
+- ウォレット検出・接続
+- トランザクション署名リクエスト
+- アドレス取得
+
+---
+
+## midnight-trusted-setup
+
+Plonk over BLS12-381 のための Trusted Setup セレモニー。ZK 証明システムに必要な共通参照文字列 (CRS) を生成する。
+
+**内容:**
+- Powers of Tau セレモニー
+- 検証ツール
+- パラメータファイル
+
+---
+
 ## 関連リンク
 
 - [Midnight Documentation](https://docs.midnight.network/)
 - [Midnight Foundation](https://midnight.network/)
-
+- [開発者ガイドブック](../docs/) - このリポジトリの詳細ガイド
