@@ -8,7 +8,7 @@
 | ファイル | 内容 |
 |---------|------|
 | [01-token-economics.md](./01-token-economics.md) | NIGHT, DUST, Shielded トークンの仕組みとプライバシーモデル |
-| [02-indexer-and-utxo.md](./02-indexer-and-utxo.md) | Indexer の役割と Substrate 上での UTXO 実現方法 |
+| [02-indexer-and-utxo.md](./02-indexer-and-utxo.md) | Indexer の役割、Substrate 上での UTXO 実現、Zswap Atomic Swap |
 
 ## 対象読者
 

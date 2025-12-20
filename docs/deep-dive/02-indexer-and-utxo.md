@@ -307,6 +307,136 @@ sequenceDiagram
 → Viewing Key がないと、コインの中身も所有者も分からない
 ```
 
+### Atomic Swap 機能
+
+Zswap が Zerocash と異なる最大のポイントは **Atomic Swap** のサポートです。
+
+#### Zerocash vs Zswap
+
+| 項目 | Zerocash (Zcash) | Zswap (Midnight) |
+|------|------------------|------------------|
+| 基本機能 | プライベート送金 | プライベート送金 |
+| 複数トークン | 1種類 (ZEC) | 複数種類対応 |
+| Atomic Swap | ❌ 不可 | ✅ 可能 |
+| オーダーブック | 外部に依存 | オンチェーンで可能 |
+
+#### Offer 構造
+
+Zswap のトランザクションは `ZswapOffer` という構造で、複数の inputs/outputs を持てます。
+
+```rust
+struct ZswapOffer<P> {
+    inputs:     Set<ZswapInput<P>>,     // 複数の入力コイン
+    outputs:    Set<ZswapOutput<P>>,    // 複数の出力コイン
+    transients: Set<ZswapTransient<P>>, // 同一Tx内で生成→消費
+    deltas:     Map<RawTokenType, i128>, // トークンごとの差分（正負）
+}
+```
+
+#### Atomic Swap の例
+
+```
+シナリオ:
+  Alice: Token A を 100 持っている → Token B が欲しい
+  Bob:   Token B を 50 持っている  → Token A が欲しい
+```
+
+```
+【Alice の Offer】
+┌────────────────────────────────────────────────┐
+│  inputs:  Token A, 100 (Alice が所有)          │
+│  outputs: Token B, 50  (Alice 宛て)  ← 欲しい  │
+│  deltas:  Token A: -100, Token B: +50          │
+│           「A を 100 出して、B を 50 欲しい」   │
+└────────────────────────────────────────────────┘
+
+【Bob の Offer】
+┌────────────────────────────────────────────────────┐
+│  inputs:  Token B, 50  (Bob が所有)                │
+│  outputs: Token A, 100 (Bob 宛て)      ← 欲しい   │
+│  deltas:  Token B: -50, Token A: +100              │
+│           「B を 50 出して、A を 100 欲しい」       │
+└────────────────────────────────────────────────────┘
+```
+
+#### Offer のマージ
+
+2つの Offer をマージして1つのトランザクションにできます。
+
+```rust
+impl<P> ZswapOffer<P> {
+    fn merge(self, other: ZswapOffer<P>) -> Result<Self> {
+        // 重複がないことを確認
+        assert!(self.inputs.disjoint(other.inputs));
+        assert!(self.outputs.disjoint(other.outputs));
+        
+        ZswapOffer {
+            inputs: self.inputs + other.inputs,       // 合体
+            outputs: self.outputs + other.outputs,    // 合体
+            deltas: self.deltas + other.deltas,       // 差分を足す
+        }
+    }
+}
+```
+
+```
+【マージ結果】
+┌──────────────────────────────────────────────────────────┐
+│  合体した Offer:                                         │
+│                                                          │
+│  inputs:  Token A, 100 (Alice)                          │
+│           Token B, 50  (Bob)                            │
+│                                                          │
+│  outputs: Token B, 50  (→Alice)                         │
+│           Token A, 100 (→Bob)                           │
+│                                                          │
+│  deltas:  Token A: -100 + 100 = 0  ✓ バランス           │
+│           Token B: -50 + 50 = 0    ✓ バランス           │
+│                                                          │
+│  → 1つのトランザクションとして成功 or 失敗              │
+└──────────────────────────────────────────────────────────┘
+```
+
+#### なぜ "Atomic" か
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                        Atomicity の保証                             │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                      │
+│  マージされた Offer が有効になる条件:                               │
+│                                                                      │
+│  1. すべての deltas がゼロ（バランス）                              │
+│  2. すべての input の ZK 証明が有効                                 │
+│  3. すべての output の ZK 証明が有効                                │
+│                                                                      │
+│  → どれか1つでも失敗すれば、全体が失敗                              │
+│  → 「Alice だけ送って Bob は送らない」は不可能                      │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+#### Zerocash との違いまとめ
+
+```
+【Zerocash（従来）】
+Tx1: Alice → Bob: 100 Token A
+Tx2: Bob → Alice: 50 Token B
+
+問題:
+- Tx1 が通った後、Bob が Tx2 を送らないかもしれない
+- 「信頼」が必要
+
+【Zswap（Atomic）】
+Tx: Alice の Offer + Bob の Offer（マージ）
+
+保証:
+- 両方成功するか、両方失敗するか
+- 「信頼不要」な P2P トークン交換
+```
+
+これにより、DEX のような機能をプライバシー保護しながらオンチェーンで実現できます。
+
 ---
 
 ## まとめ
