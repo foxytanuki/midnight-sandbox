@@ -36,24 +36,24 @@ health: ## ヘルスチェック実行
 	@./scripts/check-health.sh
 
 logs: ## 全サービスのログを表示
-	docker compose -f $(COMPOSE_FILE) logs -f
+	@exec docker compose -f $(COMPOSE_FILE) logs -f
 
 node-logs: ## Node のログを表示
-	docker compose -f $(COMPOSE_FILE) logs -f node
+	@exec docker compose -f $(COMPOSE_FILE) logs -f node
 
 indexer-logs: ## Indexer のログを表示
-	docker compose -f $(COMPOSE_FILE) logs -f indexer
+	@exec docker compose -f $(COMPOSE_FILE) logs -f indexer
 
 proof-logs: ## Proof Server のログを表示
-	docker compose -f $(COMPOSE_FILE) logs -f proof-server
+	@exec docker compose -f $(COMPOSE_FILE) logs -f proof-server
 
 ##@ 開発ツール
 
 shell: ## Node コンテナにシェル接続
-	docker compose -f $(COMPOSE_FILE) exec node /bin/sh
+	@exec docker compose -f $(COMPOSE_FILE) exec node /bin/sh
 
 wait: ## Node が起動するまで待機
-	@./scripts/wait-for-node.sh
+	@exec ./scripts/wait-for-node.sh
 
 ##@ Compact
 
@@ -62,7 +62,7 @@ compile: ## Compact コントラクトをコンパイル (CONTRACT=path を指�
 		echo "Usage: make compile CONTRACT=path/to/contract.compact"; \
 		exit 1; \
 	fi
-	compactc $(CONTRACT) $(dir $(CONTRACT))out
+	compact compile $(CONTRACT) $(dir $(CONTRACT))out
 
 ##@ クリーンアップ
 
