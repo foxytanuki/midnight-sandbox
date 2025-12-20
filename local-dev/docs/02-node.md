@@ -39,21 +39,24 @@ curl http://localhost:9944/health
 ## Indexer GraphQL の確認
 
 ```bash
-# GraphQL クエリ
-curl -X POST http://localhost:8088/graphql \
+# GraphQL クエリ (現在のブロック高を取得)
+curl -X POST http://localhost:8088/api/v1/graphql \
   -H "Content-Type: application/json" \
-  -d '{"query": "{ state { blockHeight } }"}'
+  -d '{"query": "{ block { height } }"}'
+
+# ヘルスチェック
+curl http://localhost:8088/health
 ```
 
 ## 開発用設定
 
-`docker-compose.yml` の環境変数で設定を変更できます：
+`compose.yaml` の環境変数で設定を変更できます：
 
 ```yaml
 node:
   environment:
     CFG_PRESET: dev        # 開発用プリセット
-    RUST_LOG: debug        # ログレベル
+    RUST_LOG: debug        # ログレベル（debug で詳細ログ）
 ```
 
 ## トラブルシューティング
@@ -75,7 +78,7 @@ docker compose logs node
 lsof -i :9944
 
 # 別のポートを使用
-# docker-compose.yml の ports を変更
+# compose.yaml の ports を変更
 ports:
   - "19944:9944"
 ```

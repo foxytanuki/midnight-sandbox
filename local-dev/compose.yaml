@@ -4,7 +4,7 @@
 services:
   # Midnight Node - ブロックチェーンノード
   node:
-    image: midnightntwrk/midnight-node:latest-main
+    image: midnightnetwork/midnight-node:0.12.0
     container_name: midnight-node
     ports:
       - "9944:9944"   # WebSocket RPC
@@ -25,7 +25,7 @@ services:
 
   # Indexer - GraphQL API for querying chain state
   indexer:
-    image: midnightntwrk/indexer-standalone:3.0.0-alpha.20
+    image: midnightntwrk/indexer-standalone:latest
     container_name: midnight-indexer
     ports:
       - "8088:8088"
