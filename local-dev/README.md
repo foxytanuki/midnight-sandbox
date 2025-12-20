@@ -22,7 +22,7 @@ make down
 | direnv | 環境変数の自動設定 | [direnv.net](https://direnv.net/) |
 | Docker | ノード・インデクサー実行 | [docker.com](https://docker.com) |
 | Node.js 20+ | dApp 開発 | [nvm](https://github.com/nvm-sh/nvm) |
-| compactc | Compact コンパイル | [後述](#compact-コンパイラ) |
+| compact | Compact コンパイル | [後述](#compact-コンパイラ) |
 
 ## アーキテクチャ
 
@@ -65,7 +65,7 @@ curl --proto '=https' --tlsv1.2 -LsSf \
   https://github.com/midnightntwrk/compact/releases/download/compact-v0.3.0/compact-installer.sh | sh
 
 # 確認
-compactc --version
+compact -V
 ```
 
 ## エンドポイント一覧

@@ -65,7 +65,7 @@ curl --proto '=https' --tlsv1.2 -LsSf \
   https://github.com/midnightntwrk/compact/releases/download/compact-v0.3.0/compact-installer.sh | sh
 
 # 確認
-compactc --version
+compact -V
 ```
 
 ## ローカル環境の起動

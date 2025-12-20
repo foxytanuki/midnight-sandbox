@@ -5,7 +5,7 @@
 ## コンパイル
 
 ```bash
-compactc counter.compact out/
+compact compile counter.compact out/
 ```
 
 ## 出力ファイル

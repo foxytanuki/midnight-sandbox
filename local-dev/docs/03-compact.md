@@ -44,7 +44,7 @@ export circuit get_count(): Unsigned Integer {
 
 ```bash
 # コンパイル
-compactc counter.compact out/
+compact compile counter.compact out/
 
 # 出力ファイル
 # out/

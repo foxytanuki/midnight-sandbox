@@ -244,7 +244,7 @@ export circuit admin_function(): [] {
 
 ```
 1. Compact でコントラクト作成
-2. compactc でコンパイル (→ JS, 型定義, ZKキー)
+2. compact compile でコンパイル (→ JS, 型定義, ZKキー)
 3. TypeScript で witness 実装
 4. midnight-js でフロントエンド連携
 5. ZK 証明生成 + Midnight Wallet で署名

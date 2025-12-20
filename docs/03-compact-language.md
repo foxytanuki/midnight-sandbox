@@ -176,7 +176,7 @@ export circuit prove_sufficient_balance(
 
 ```typescript
 // witnesses.ts
-import { type Witnesses } from './counter'; // compactc が生成
+import { type Witnesses } from './counter'; // compact compile が生成
 
 type PrivateState = {
   myBalance: bigint;
@@ -272,7 +272,7 @@ export circuit close_voting(): [] {
 ### コンパイルコマンド
 
 ```bash
-compactc voting.compact --output ./build
+compact compile voting.compact ./build
 ```
 
 ### 生成されるファイル
@@ -419,13 +419,7 @@ export circuit safe_divide(a: Unsigned Integer, b: Unsigned Integer): Unsigned I
 
 ```bash
 # コンパイル
-compactc contract.compact --output ./build
-
-# 型チェック
-compactc --check contract.compact
-
-# ドキュメント生成
-compactc --doc contract.compact
+compact compile contract.compact ./build
 ```
 
 ---

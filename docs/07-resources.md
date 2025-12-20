@@ -206,7 +206,7 @@ const result = await contract.call('myCircuit', { arg1: 42n });
 
 | 問題 | 解決策 |
 |------|--------|
-| コンパイルエラー | `compactc` のバージョン確認 |
+| コンパイルエラー | `compact -V` でバージョン確認 |
 | 証明生成失敗 | Proof Server のログ確認 |
 | 接続エラー | Node/Indexer の URL 確認 |
 | タイムアウト | タイムアウト値の増加 |
