@@ -41,16 +41,21 @@ pnpm start
 
 ## Midnight のハイライト
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                    Midnight の特徴                                   │
-│                                                                      │
-│   🔒 プライバシー      パブリック + プライベート状態の両立             │
-│   ⚡ ZK ネイティブ     ゼロ知識証明がビルトイン                        │
-│   🌉 Cardano 連携     Partner Chain として動作                       │
-│   📝 TypeScript       開発者フレンドリーな SDK                        │
-│                                                                      │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+mindmap
+  root((Midnight))
+    Privacy
+      パブリック + プライベート状態
+      選択的開示
+    ZK Native
+      ゼロ知識証明がビルトイン
+      Plonk + KZG
+    Cardano
+      Partner Chain
+      cNIGHT ブリッジ
+    Developer Experience
+      TypeScript SDK
+      Compact 言語
 ```
 
 ## 関連リポジトリ

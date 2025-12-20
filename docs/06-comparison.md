@@ -4,33 +4,32 @@
 
 ## アーキテクチャ比較
 
+```mermaid
+flowchart LR
+    subgraph eth["Ethereum (EVM)"]
+        direction LR
+        e1[User] --> e2[Transaction] --> e3[Node] --> e4[EVM Execution] --> e5[State Update]
+        e3 --> e6["すべて公開実行"]
+    end
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                          Ethereum (EVM)                              │
-│                                                                      │
-│   User ─→ Transaction ─→ Node ─→ EVM Execution ─→ State Update      │
-│                           │                                          │
-│                     すべてオンチェーンで公開実行                        │
-└─────────────────────────────────────────────────────────────────────┘
 
-┌─────────────────────────────────────────────────────────────────────┐
-│                            Solana                                    │
-│                                                                      │
-│   User ─→ Transaction ─→ Leader ─→ BPF Execution ─→ State Update    │
-│                           │                                          │
-│                     高速並列実行、すべて公開                           │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph sol["Solana"]
+        direction LR
+        s1[User] --> s2[Transaction] --> s3[Leader] --> s4[BPF Execution] --> s5[State Update]
+        s3 --> s6["高速並列、すべて公開"]
+    end
+```
 
-┌─────────────────────────────────────────────────────────────────────┐
-│                           Midnight                                   │
-│                                                                      │
-│   User ─→ Local Execution ─→ ZK Proof Generation ─→ Node            │
-│             │                        │                │              │
-│        Private State            ZK Proof        Verification        │
-│        (ローカル)              (証明)          & State Update        │
-│                                                                      │
-│                 計算はオフチェーン、検証のみオンチェーン                 │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart LR
+    subgraph mid["Midnight"]
+        direction LR
+        m1[User] --> m2[Local Execution] --> m3[ZK Proof] --> m4[Node] --> m5[Verification & State Update]
+        m2 --> m6[Private State<br/>ローカル]
+        m4 --> m7["計算オフチェーン<br/>検証のみオンチェーン"]
+    end
 ```
 
 ## 主要概念の対応表

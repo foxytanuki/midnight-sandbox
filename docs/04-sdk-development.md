@@ -44,41 +44,27 @@ my-dapp/
 
 ## アーキテクチャ概要
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                           Your dApp                                  │
-├─────────────────────────────────────────────────────────────────────┤
-│                                                                      │
-│   ┌────────────────────────────────────────────────────────────┐    │
-│   │                   Contract API                              │    │
-│   │   (Compact から生成されたコントラクトインターフェース)          │    │
-│   └────────────────────────────────────────────────────────────┘    │
-│                              │                                       │
-│                              ▼                                       │
-│   ┌────────────────────────────────────────────────────────────┐    │
-│   │              @midnight-ntwrk/midnight-js-contracts          │    │
-│   │                                                             │    │
-│   │   - deployContract()    コントラクトデプロイ                  │    │
-│   │   - findContract()      既存コントラクト接続                  │    │
-│   │   - callTx()            circuit 呼び出し                     │    │
-│   │                                                             │    │
-│   └────────────────────────────────────────────────────────────┘    │
-│                              │                                       │
-│                              ▼                                       │
-│   ┌─────────────┬─────────────┬─────────────┬─────────────────┐    │
-│   │ PublicData  │   Proof     │ PrivateState│    ZKConfig     │    │
-│   │  Provider   │  Provider   │  Provider   │    Provider     │    │
-│   │             │             │             │                 │    │
-│   │ (Indexer)   │(ProofServer)│ (LevelDB)   │  (Keys/ZKIR)    │    │
-│   └─────────────┴─────────────┴─────────────┴─────────────────┘    │
-│          │              │             │              │              │
-└──────────│──────────────│─────────────│──────────────│──────────────┘
-           │              │             │              │
-           ▼              ▼             ▼              ▼
-      ┌─────────┐   ┌─────────┐   ┌─────────┐   ┌─────────────┐
-      │ Indexer │   │  Proof  │   │  Local  │   │  ZK Artifact│
-      │   API   │   │ Server  │   │ Storage │   │   Storage   │
-      └─────────┘   └─────────┘   └─────────┘   └─────────────┘
+```mermaid
+graph TB
+    subgraph dapp["Your dApp"]
+        contract_api["Contract API<br/>(Compact から生成)"]
+        contracts["@midnight-ntwrk/midnight-js-contracts<br/>deployContract / findContract / callTx"]
+        
+        subgraph providers["Providers"]
+            pub["PublicData<br/>(Indexer)"]
+            proof["Proof<br/>(ProofServer)"]
+            priv["PrivateState<br/>(LevelDB)"]
+            zk["ZKConfig<br/>(Keys/ZKIR)"]
+        end
+        
+        contract_api --> contracts
+        contracts --> providers
+    end
+    
+    pub --> indexer["Indexer API"]
+    proof --> proofserver["Proof Server"]
+    priv --> storage["Local Storage"]
+    zk --> artifacts["ZK Artifact Storage"]
 ```
 
 ## プロバイダーの設定

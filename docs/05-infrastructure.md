@@ -4,37 +4,33 @@
 
 ## 概要
 
+```mermaid
+graph TB
+    subgraph dev["Development (Local)"]
+        node_dev["Node (standalone)"]
+        indexer_dev["Indexer (standalone)"]
+        proof_dev["Proof Server"]
+    end
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                         Development                                  │
-│                                                                      │
-│   ┌─────────────────────────────────────────────────────────────┐   │
-│   │                    Local Development                         │   │
-│   │                                                              │   │
-│   │   Node (standalone) + Indexer (standalone) + Proof Server   │   │
-│   │                                                              │   │
-│   └─────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────────────────────┘
 
-┌─────────────────────────────────────────────────────────────────────┐
-│                         Production                                   │
-│                                                                      │
-│   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐           │
-│   │    Node      │   │  Chain       │   │  Indexer     │           │
-│   │   Cluster    │   │  Indexer     │   │    API       │           │
-│   └──────────────┘   └──────────────┘   └──────────────┘           │
-│          ▲                  │                  ▲                    │
-│          │                  ▼                  │                    │
-│          │           ┌──────────────┐          │                    │
-│          │           │  PostgreSQL  │          │                    │
-│          │           │     NATS     │          │                    │
-│          │           └──────────────┘          │                    │
-│          │                  ▲                  │                    │
-│          │                  │                  │                    │
-│   ┌──────┴──────────────────┴──────────────────┴──────┐             │
-│   │                   Wallet Indexer                   │             │
-│   └────────────────────────────────────────────────────┘             │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+graph TB
+    subgraph prod["Production"]
+        node_cluster["Node Cluster"]
+        chain_indexer["Chain Indexer"]
+        indexer_api["Indexer API"]
+        wallet_indexer["Wallet Indexer"]
+        
+        subgraph storage["Shared Storage"]
+            postgres["PostgreSQL"]
+            nats["NATS"]
+        end
+        
+        node_cluster --> chain_indexer
+        chain_indexer --> storage
+        storage --> indexer_api
+        storage --> wallet_indexer
+    end
 ```
 
 ## Midnight Node
@@ -113,29 +109,12 @@ ws.send(JSON.stringify({
 
 ### アーキテクチャ
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                       Midnight Indexer                               │
-│                                                                      │
-│   ┌─────────────────┐                                               │
-│   │  Chain Indexer  │ ◄─── Node からブロックを取得                   │
-│   └─────────────────┘                                               │
-│            │                                                         │
-│            ▼                                                         │
-│   ┌─────────────────┐                                               │
-│   │    Database     │ ◄─── SQLite (standalone) / PostgreSQL (cloud) │
-│   └─────────────────┘                                               │
-│            │                                                         │
-│            ▼                                                         │
-│   ┌─────────────────┐                                               │
-│   │   Indexer API   │ ◄─── GraphQL Query/Subscription                │
-│   └─────────────────┘                                               │
-│            │                                                         │
-│            ▼                                                         │
-│   ┌─────────────────┐                                               │
-│   │ Wallet Indexer  │ ◄─── ウォレット関連トランザクションの追跡       │
-│   └─────────────────┘                                               │
-└─────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    node[Node] -->|ブロック取得| chain[Chain Indexer]
+    chain -->|保存| db[(Database<br/>SQLite / PostgreSQL)]
+    db --> api[Indexer API<br/>GraphQL Query/Subscription]
+    db --> wallet[Wallet Indexer<br/>ウォレットTx追跡]
 ```
 
 ### Standalone モード（開発用）
@@ -440,27 +419,19 @@ docker run -e RUST_LOG=debug midnightntwrk/indexer-standalone
 
 ### 推奨構成
 
-```
-┌─────────────────────────────────────────────────────────────────────┐
-│                           Load Balancer                              │
-│                         (TLS Termination)                            │
-└─────────────────────────────────────────────────────────────────────┘
-                              │
-         ┌────────────────────┼────────────────────┐
-         ▼                    ▼                    ▼
-   ┌──────────┐         ┌──────────┐         ┌──────────┐
-   │ Indexer  │         │ Indexer  │         │ Indexer  │
-   │   API    │         │   API    │         │   API    │
-   │  (Pod 1) │         │  (Pod 2) │         │  (Pod 3) │
-   └──────────┘         └──────────┘         └──────────┘
-         │                    │                    │
-         └────────────────────┼────────────────────┘
-                              │
-                              ▼
-                    ┌──────────────────┐
-                    │    PostgreSQL    │
-                    │   (HA Cluster)   │
-                    └──────────────────┘
+```mermaid
+flowchart TB
+    lb["Load Balancer<br/>(TLS Termination)"]
+    
+    lb --> api1["Indexer API (Pod 1)"]
+    lb --> api2["Indexer API (Pod 2)"]
+    lb --> api3["Indexer API (Pod 3)"]
+    
+    api1 --> db
+    api2 --> db
+    api3 --> db
+    
+    db[("PostgreSQL<br/>(HA Cluster)")]
 ```
 
 ---
