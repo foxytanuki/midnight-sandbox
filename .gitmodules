@@ -1,21 +1,21 @@
 [submodule "midnight-node"]
-	path = midnight-node
+	path = submodules/midnight-node
 	url = https://github.com/midnightntwrk/midnight-node.git
 [submodule "partner-chains"]
-	path = partner-chains
+	path = submodules/partner-chains
 	url = https://github.com/input-output-hk/partner-chains.git
 [submodule "midnight-indexer"]
-	path = midnight-indexer
+	path = submodules/midnight-indexer
 	url = https://github.com/midnightntwrk/midnight-indexer.git
 [submodule "midnight-ledger"]
-	path = midnight-ledger
+	path = submodules/midnight-ledger
 	url = https://github.com/midnightntwrk/midnight-ledger.git
 [submodule "midnight-js"]
-	path = midnight-js
+	path = submodules/midnight-js
 	url = https://github.com/midnightntwrk/midnight-js.git
 [submodule "midnight-wallet"]
-	path = midnight-wallet
+	path = submodules/midnight-wallet
 	url = https://github.com/midnightntwrk/midnight-wallet.git
 [submodule "midnight-zk"]
-	path = midnight-zk
+	path = submodules/midnight-zk
 	url = https://github.com/midnightntwrk/midnight-zk.git
