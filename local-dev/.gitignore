@@ -1,0 +1,20 @@
+# Compiled contracts
+examples/*/out/
+
+# Environment
+.env
+.envrc.local
+
+# Node modules (if any examples use npm)
+node_modules/
+
+# Logs
+*.log
+
+# Editor
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+

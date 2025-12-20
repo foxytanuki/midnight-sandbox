@@ -1,0 +1,55 @@
+# Midnight Local Development Stack
+# ローカル dApp 開発用の完全な環境
+
+services:
+  # Midnight Node - ブロックチェーンノード
+  node:
+    image: midnightntwrk/midnight-node:latest
+    container_name: midnight-node
+    ports:
+      - "9944:9944"   # WebSocket RPC
+      - "30333:30333" # P2P (optional)
+    environment:
+      CFG_PRESET: dev
+      RUST_LOG: info
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9944/health"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  # Indexer - GraphQL API for querying chain state
+  indexer:
+    image: midnightntwrk/indexer-standalone:latest
+    container_name: midnight-indexer
+    ports:
+      - "8088:8088"
+    environment:
+      RUST_LOG: info
+      APP__INFRA__NODE__URL: ws://node:9944
+      APP__INFRA__SECRET: "303132333435363738393031323334353637383930313233343536373839303132"
+    depends_on:
+      node:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Proof Server - ZK proof generation
+  proof-server:
+    image: midnightntwrk/proof-server:latest
+    container_name: midnight-proof-server
+    ports:
+      - "6300:6300"
+    environment:
+      RUST_BACKTRACE: full
+      RUST_LOG: info
+    restart: unless-stopped
+
+networks:
+  default:
+    name: midnight-local
+
+volumes:
+  node-data:
+
