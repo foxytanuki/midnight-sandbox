@@ -29,12 +29,12 @@ errors=0
 check_service "Node" "$NODE_URL" "/health" || errors=$((errors + 1))
 
 # Indexer GraphQL check
-if curl -sf "$INDEXER_URL/graphql" \
+if curl -sf "$INDEXER_URL/api/v1/graphql" \
     -H "Content-Type: application/json" \
     -d '{"query":"{ __typename }"}' > /dev/null 2>&1; then
-    echo "✅ Indexer: OK ($INDEXER_URL/graphql)"
+    echo "✅ Indexer: OK ($INDEXER_URL)"
 else
-    echo "❌ Indexer: UNAVAILABLE ($INDEXER_URL/graphql)"
+    echo "❌ Indexer: UNAVAILABLE ($INDEXER_URL)"
     errors=$((errors + 1))
 fi
 
