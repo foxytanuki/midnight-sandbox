@@ -19,6 +19,7 @@ make down
 
 | ツール | 用途 | インストール |
 |--------|------|-------------|
+| direnv | 環境変数の自動設定 | [direnv.net](https://direnv.net/) |
 | Docker | ノード・インデクサー実行 | [docker.com](https://docker.com) |
 | Node.js 20+ | dApp 開発 | [nvm](https://github.com/nvm-sh/nvm) |
 | compactc | Compact コンパイル | [後述](#compact-コンパイラ) |
@@ -81,7 +82,7 @@ compactc --version
 local-dev/
 ├── README.md              # このファイル
 ├── Makefile               # コマンド集
-├── docker-compose.yml     # ローカル環境定義
+├── compose.yaml           # ローカル環境定義
 ├── docs/                  # ドキュメント
 │   ├── 01-setup.md
 │   ├── 02-node.md

@@ -4,7 +4,31 @@
 
 ## 必須ツール
 
-### 1. Docker
+### 1. direnv
+
+プロジェクトディレクトリに入った際に自動的に環境変数を設定するために必要です。
+
+```bash
+# Ubuntu/Debian
+sudo apt-get install direnv
+
+# macOS
+brew install direnv
+```
+
+シェルへのフック設定（`~/.zshrc` または `~/.bashrc` に追加）:
+
+```bash
+# zsh の場合
+eval "$(direnv hook zsh)"
+
+# bash の場合
+eval "$(direnv hook bash)"
+```
+
+設定後、シェルを再起動するか `source ~/.zshrc` を実行してください。
+
+### 2. Docker
 
 ノード、インデクサー、Proof Server を実行するために必要です。
 
@@ -17,7 +41,7 @@ sudo apt-get install docker.io docker-compose-plugin
 brew install --cask docker
 ```
 
-### 2. Node.js (v20+)
+### 3. Node.js (v20+)
 
 midnight-js を使った dApp 開発に必要です。
 
@@ -31,7 +55,7 @@ nvm use 20
 node --version  # v20.x.x
 ```
 
-### 3. Compact コンパイラ
+### 4. Compact コンパイラ
 
 Compact 言語でスマートコントラクトを書くために必要です。
 
