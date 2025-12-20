@@ -2,6 +2,60 @@
 
 Midnight ブロックチェーンを構成する各コンポーネントのサブモジュール一覧です。
 
+## アーキテクチャ
+
+```mermaid
+graph TB
+    subgraph "Application Layer"
+        dapp[dApp]
+    end
+
+    subgraph "SDK Layer"
+        js[midnight-js]
+        wallet[midnight-wallet]
+    end
+
+    subgraph "Infrastructure Layer"
+        indexer[midnight-indexer]
+        node[midnight-node]
+    end
+
+    subgraph "Core Library Layer"
+        ledger[midnight-ledger]
+        zk[midnight-zk]
+    end
+
+    subgraph "Foundation Layer"
+        partner[partner-chains]
+    end
+
+    %% Application → SDK
+    dapp --> js
+    dapp --> wallet
+
+    %% SDK → Infrastructure
+    js --> indexer
+    js --> wallet
+    wallet --> indexer
+    wallet --> node
+
+    %% Infrastructure dependencies
+    indexer --> node
+    node --> ledger
+    node -.-> partner
+
+    %% Core dependencies
+    ledger --> zk
+
+    %% SDK → Core (WASM bindings)
+    js -.-> ledger
+    wallet -.-> ledger
+```
+
+**凡例:**
+- 実線 → 直接的な依存・通信
+- 点線 → ライブラリ依存（WASM バインディング等）
+
 ## リポジトリ概要
 
 | リポジトリ | 言語 | 概要 |
