@@ -1,31 +1,33 @@
 // counter.compact
 // シンプルなカウンターコントラクト
 
-pragma midnight 0.3.0;
+pragma language_version >= 0.17;
 
 // オンチェーン状態（すべての参加者に公開）
-ledger {
-  count: Unsigned Integer;
+export ledger count: Uint<64>;
+
+// コントラクト初期化
+constructor() {
+  count = 0 as Uint<64>;
 }
 
 // カウントを1増やす
 export circuit increment(): [] {
-  ledger.count = ledger.count + 1;
+  count = (count + 1) as Uint<64>;
 }
 
 // カウントを1減らす
 export circuit decrement(): [] {
-  assert ledger.count > 0;
-  ledger.count = ledger.count - 1;
+  assert(count > 0, "count must be greater than 0");
+  count = (count - 1) as Uint<64>;
 }
 
 // 現在のカウントを取得
-export circuit get_count(): Unsigned Integer {
-  return ledger.count;
+export circuit get_count(): Uint<64> {
+  return count;
 }
 
-// 指定した値を加算
-export circuit add(value: Unsigned Integer): [] {
-  ledger.count = ledger.count + value;
+// 指定した値を加算（値は公開される）
+export circuit add(value: Uint<64>): [] {
+  count = (count + disclose(value)) as Uint<64>;
 }
-
