@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "index.cjs",
+  "sourceRoot": "../../",
+  "sources": ["voting.compact"],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAYA;;;;;;;;;;MAQA,AAAA,QAIC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,OAIC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,YAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,aAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,YAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,eAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;;;;;;;;;;GAlCA;EALD;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IANA;;;;;;;;;uDAAiC;IACjC;;;;;;;;;uDAAgC;IAChC;;;;;;;;;uDAAmC;IACnC;;;;;;;;;uDAA8B;UAI5B,KAAQ;IAAR;;;;;;;yGAAA,KAAQ;;uDAAA;UACR,KAAO;IAAP;;;;;;;yGAAA,KAAO;;uDAAA;UACP,KAAU;IAAV;;;;;;;yGAAA,KAAU;;uDAAA;IACV;;;;;;;;;uDAAM;;;;;;;GACP;EAGD,AAAA,WAIC;oDAHQ;;;;;;;;;;;uGAAM;;UACb,KAAQ;;;;;6CAAI;;;;;;;;;;;gGAAQ;;;IAApB;;;;;;;yGAAA,KAAQ;;uDAAA;UACR,KAAU;;;;;6CAAI;;;;;;;;;;;gGAAU;;;IAAxB;;;;;;;yGAAA,KAAU;;uDAAA;;GACX;EAGD,AAAA,UAIC;oDAHQ;;;;;;;;;;;uGAAM;;UACb,KAAO;;;;;6CAAI;;;;;;;;;;;gGAAO;;;IAAlB;;;;;;;yGAAA,KAAO;;uDAAA;UACP,KAAU;;;;;6CAAI;;;;;;;;;;;gGAAU;;;IAAxB;;;;;;;yGAAA,KAAU;;uDAAA;;GACX;EAGD,AAAA,eAEC;IADC;;;;;;;;;uDAAM;;GACP;EAGD,AAAA,gBAEC;mCADQ;;;;;;;;;;;sFAAQ;GAChB;EAGD,AAAA,eAEC;mCADQ;;;;;;;;;;;sFAAO;GACf;EAGD,AAAA,kBAEC;mCADQ;;;;;;;;;;;sFAAU;GAClB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IA7CD;qCAAA;;;;;;;;;;;wFAAiC;KAAA;IACjC;qCAAA;;;;;;;;;;;wFAAgC;KAAA;IAChC;qCAAA;;;;;;;;;;;wFAAmC;KAAA;IACnC;qCAAA;;;;;;;;;;;wFAA8B;KAAA;;;;;;;;;;;;;;"
+}

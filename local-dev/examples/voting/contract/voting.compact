@@ -1,7 +1,7 @@
 // voting.compact
 // シンプルな投票コントラクト（Yes/No投票）
 
-pragma language_version >= 0.17;
+pragma language_version >= 0.18.0;
 
 // オンチェーン状態
 export ledger yesVotes: Uint<64>;

@@ -1,7 +1,7 @@
 // lottery.compact
 // シンプルな抽選コントラクト
 
-pragma language_version >= 0.17;
+pragma language_version >= 0.18.0;
 
 // オンチェーン状態
 export ledger participantCount: Uint<64>;

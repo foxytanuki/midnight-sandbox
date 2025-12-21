@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "index.cjs",
+  "sourceRoot": "../../",
+  "sources": ["lottery.compact"],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAYA;;;;;;;;;;MAQA,AAAA,KAIC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,WAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,IAOC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,qBAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,UAGC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,QAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;;;;;;;;;;GAtCA;EALD;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IANA;;;;;;;;;uDAAyC;IACzC;;;;;;;;;uDAAqC;IACrC;;;;;;;;;uDAA+B;IAC/B;;;;;;;;;uDAA8B;UAI5B,KAAgB;IAAhB;;;;;;;yGAAA,KAAgB;;uDAAA;UAChB,KAAY;IAAZ;;;;;;;yGAAA,KAAY;;uDAAA;IACZ;;;;;;;;;uDAAO;IACP;;;;;;;;;uDAAM;;;;;;;GACP;EAGD,AAAA,QAIC;oDAHQ;;;;;;;;;;;uGAAM;;qDACL;;;;;;;;;;;wGAAO;;UACf,KAAgB;;;;;6CAAI;;;;;;;;;;;gGAAgB;;;IAApC;;;;;;;yGAAA,KAAgB;;uDAAA;;GACjB;EAGD,AAAA,cAEC;IADC;;;;;;;;;uDAAM;;GACP;EAGD,AAAA,OAOC;qDANS;;;;;;;;;;;wGAAM;;qDACN;;;;;;;;;;;wGAAO;;oDACR;;;;;;;;;;;uGAAgB;;;;UAEvB,KAAY;IAAZ;;;;;;;yGAAA,KAAY;;uDAAA;IACZ;;;;;;;;;uDAAO;;GACR;EAGD,AAAA,wBAEC;mCADQ;;;;;;;;;;;sFAAgB;GACxB;EAGD,AAAA,aAGC;oDAFQ;;;;;;;;;;;uGAAO;;mCACP;;;;;;;;;;;sFAAY;GACpB;EAGD,AAAA,WAEC;mCADQ;;;;;;;;;;;sFAAO;GACf;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAjDD;qCAAA;;;;;;;;;;;wFAAyC;KAAA;IACzC;qCAAA;;;;;;;;;;;wFAAqC;KAAA;IACrC;qCAAA;;;;;;;;;;;wFAA+B;KAAA;IAC/B;qCAAA;;;;;;;;;;;wFAA8B;KAAA;;;;;;;;;;;;;;"
+}

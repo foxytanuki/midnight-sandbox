@@ -1,0 +1,8 @@
+{
+  "version": 3,
+  "file": "index.cjs",
+  "sourceRoot": "../../",
+  "sources": ["auction.compact"],
+  "names": [],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAYA;;;;;;;;;;MAQA,AAAA,GAMC;;;;;cANkB,QAAgB;;;;;;;;;;;;;;;;;;yCAAhB,QAAgB;;;;;;;gEAAhB,QAAgB;;;OAMlC;MAGD,AAAA,aAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,MAGC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,eAGC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,aAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,WAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;;;;;;;;;;GApCA;EALD;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IANA;;;;;;;;;uDAAmC;IACnC;;;;;;;;;uDAAiC;IACjC;;;;;;;;;uDAA8B;IAC9B;;;;;;;;;uDAAkC;UAIhC,KAAU;IAAV;;;;;;;yGAAA,KAAU;;uDAAA;UACV,KAAQ;IAAR;;;;;;;yGAAA,KAAQ;;uDAAA;IACR;;;;;;;;;uDAAM;IACN;;;;;;;;;uDAAU;;;;;;;GACX;EAGD,AAAA,MAMC,4BANkB,QAAgB;oDAC1B;;;;;;;;;;;uGAAM;;UACb,KAAQ;;;;;6CAAI;;;;;;;;;;;gGAAQ;;;IAApB;;;;;;;yGAAA,KAAQ;;uDAAA;4BAEQ,QAAM;;oDAAI;;;;;;;;;;;uGAAU;;IACpC;;;;;;;yGAAsB,QAAM;;uDAAlB;;GACX;EAGD,AAAA,gBAEC;IADC;;;;;;;;;uDAAM;;GACP;EAGD,AAAA,SAGC;qDAFS;;;;;;;;;;;wGAAM;;IACd;;;;;;;;;uDAAU;;GACX;EAGD,AAAA,kBAGC;oDAFQ;;;;;;;;;;;uGAAU;;mCACV;;;;;;;;;;;sFAAU;GAClB;EAGD,AAAA,gBAEC;mCADQ;;;;;;;;;;;sFAAQ;GAChB;EAGD,AAAA,cAEC;mCADQ;;;;;;;;;;;sFAAU;GAClB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IA/CD;qCAAA;;;;;;;;;;;wFAAmC;KAAA;IACnC;qCAAA;;;;;;;;;;;wFAAiC;KAAA;IACjC;qCAAA;;;;;;;;;;;wFAA8B;KAAA;IAC9B;qCAAA;;;;;;;;;;;wFAAkC;KAAA;;;;;;;;;;;;;;"
+}

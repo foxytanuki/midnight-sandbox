@@ -1,7 +1,7 @@
 // counter.compact
 // シンプルなカウンターコントラクト
 
-pragma language_version >= 0.17;
+pragma language_version >= 0.18.0;
 
 // オンチェーン状態（すべての参加者に公開）
 export ledger count: Uint<64>;

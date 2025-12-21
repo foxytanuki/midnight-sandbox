@@ -1,7 +1,7 @@
 // escrow.compact
 // シンプルなエスクローコントラクト
 
-pragma language_version >= 0.17;
+pragma language_version >= 0.18.0;
 
 // 状態: 0=Created, 1=Funded, 2=Released, 3=Refunded
 export ledger state: Uint<8>;
