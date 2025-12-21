@@ -1,24 +1,67 @@
-# Counter Contract Example
+# Counter dApp Example
 
-シンプルなカウンターコントラクトのサンプルです。
+Midnight の Compact コントラクトと midnight-js を使ったシンプルなカウンター dApp の例です。
 
-## コンパイル
+## 構造
+
+```
+counter/
+├── contract/              # コンパイル済み Compact コントラクト
+│   ├── counter.compact    # ソースファイル
+│   ├── contract/          # 生成された TypeScript
+│   ├── keys/              # Prover/Verifier キー
+│   └── zkir/              # ZK IR ファイル
+├── src/
+│   ├── deploy.ts          # デプロイスクリプト
+│   ├── cli.ts             # 対話式 CLI
+│   └── run-circuit.ts     # 単一コマンド実行
+├── deployment.json        # デプロイ結果
+└── package.json
+```
+
+## 前提条件
+
+- ローカル環境が起動していること (`make up` in `local-dev/`)
+- Node.js 18+
+
+## セットアップ
 
 ```bash
-compact compile counter.compact out/
+pnpm install
+pnpm run build
 ```
 
-## 出力ファイル
+## 使用方法
 
-```
-out/
-├── index.js          # コントラクトランタイム
-├── index.d.ts        # TypeScript 型定義
-├── witnesses.js      # ウィットネス定義
-└── managed/          # ZK キー等
+### デプロイ
+
+```bash
+pnpm run deploy
 ```
 
-## 使い方
+### サーキット実行
 
-詳細は [../../example-counter](../../../example-counter/) を参照してください。
+```bash
+# 単一コマンド
+pnpm run run increment
+pnpm run run decrement
+pnpm run run add 5
+pnpm run run get_count
 
+# 対話式 CLI
+pnpm run cli
+```
+
+## コントラクト
+
+`contract/counter.compact` は以下のサーキットを持つシンプルなカウンターです：
+
+- `increment` - カウンターを +1
+- `decrement` - カウンターを -1
+- `add(value)` - カウンターに value を加算
+- `get_count` - 現在のカウント値を取得
+
+## 参考
+
+- [04-deploy.md](../../docs/04-deploy.md) - デプロイ方法
+- [05-dapp.md](../../docs/05-dapp.md) - dApp 開発
