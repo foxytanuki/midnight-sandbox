@@ -27,8 +27,8 @@ counter/
 ## セットアップ
 
 ```bash
-pnpm install
-pnpm run build
+bun install
+bun run build
 ```
 
 ## 使用方法
@@ -36,20 +36,20 @@ pnpm run build
 ### デプロイ
 
 ```bash
-pnpm run deploy
+bun run deploy
 ```
 
 ### サーキット実行
 
 ```bash
 # 単一コマンド
-pnpm run run increment
-pnpm run run decrement
-pnpm run run add 5
-pnpm run run get_count
+bun run run increment
+bun run run decrement
+bun run run add 5
+bun run run get_count
 
 # 対話式 CLI
-pnpm run cli
+bun run cli
 ```
 
 ## コントラクト

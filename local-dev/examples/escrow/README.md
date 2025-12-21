@@ -5,16 +5,16 @@
 ## 使用方法
 
 ```bash
-pnpm install
-pnpm run build
-pnpm run deploy
+bun install
+bun run build
+bun run deploy
 
-pnpm run run fund 1000     # 1000 を預ける
-pnpm run run release       # 受取人に解放
-pnpm run run refund        # 送金者に返金
-pnpm run run get_state     # 状態を取得
-pnpm run run get_amount    # 金額を取得
-pnpm run run is_completed  # 完了したか確認
+bun run run fund 1000     # 1000 を預ける
+bun run run release       # 受取人に解放
+bun run run refund        # 送金者に返金
+bun run run get_state     # 状態を取得
+bun run run get_amount    # 金額を取得
+bun run run is_completed  # 完了したか確認
 ```
 
 ## 状態遷移

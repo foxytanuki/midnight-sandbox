@@ -5,21 +5,21 @@
 ## セットアップ
 
 ```bash
-pnpm install
-pnpm run build
+bun install
+bun run build
 ```
 
 ## 使用方法
 
 ```bash
-pnpm run deploy              # デプロイ
+bun run deploy              # デプロイ
 
-pnpm run run vote_yes        # Yes に投票
-pnpm run run vote_no         # No に投票
-pnpm run run close_voting    # 投票を締め切る
-pnpm run run get_yes_votes   # Yes 票数を取得
-pnpm run run get_no_votes    # No 票数を取得
-pnpm run run get_total_votes # 総票数を取得
+bun run run vote_yes        # Yes に投票
+bun run run vote_no         # No に投票
+bun run run close_voting    # 投票を締め切る
+bun run run get_yes_votes   # Yes 票数を取得
+bun run run get_no_votes    # No 票数を取得
+bun run run get_total_votes # 総票数を取得
 ```
 
 ## コントラクト

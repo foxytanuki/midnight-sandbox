@@ -20,8 +20,8 @@ token/
 ## セットアップ
 
 ```bash
-pnpm install
-pnpm run build
+bun install
+bun run build
 ```
 
 ## 使用方法
@@ -29,16 +29,16 @@ pnpm run build
 ### デプロイ
 
 ```bash
-pnpm run deploy
+bun run deploy
 ```
 
 ### サーキット実行
 
 ```bash
-pnpm run run mint 1000        # 1000 トークンを発行
-pnpm run run burn 500         # 500 トークンをバーン
-pnpm run run get_balance      # 残高を取得
-pnpm run run get_total_supply # 総供給量を取得
+bun run run mint 1000        # 1000 トークンを発行
+bun run run burn 500         # 500 トークンをバーン
+bun run run get_balance      # 残高を取得
+bun run run get_total_supply # 総供給量を取得
 ```
 
 ## コントラクト
