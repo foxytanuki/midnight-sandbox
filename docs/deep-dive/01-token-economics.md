@@ -370,3 +370,4 @@ A: その通り。ドル換算のコストは変動する
 - [midnight-ledger/spec/zswap.md](https://github.com/midnightntwrk/midnight-ledger/blob/main/spec/zswap.md)
 - [midnight-ledger/spec/night.md](https://github.com/midnightntwrk/midnight-ledger/blob/main/spec/night.md)
 
+

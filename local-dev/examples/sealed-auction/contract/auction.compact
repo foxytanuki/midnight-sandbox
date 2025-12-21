@@ -1,0 +1,54 @@
+// auction.compact
+// シンプルな入札オークションコントラクト
+
+pragma language_version >= 0.17;
+
+// オンチェーン状態
+export ledger highestBid: Uint<64>;
+export ledger bidCount: Uint<64>;
+export ledger isOpen: Boolean;
+export ledger isRevealed: Boolean;
+
+// コントラクト初期化
+constructor() {
+  highestBid = 0 as Uint<64>;
+  bidCount = 0 as Uint<64>;
+  isOpen = true;
+  isRevealed = false;
+}
+
+// 入札を行う（最高額を更新）
+export circuit bid(amount: Uint<64>): [] {
+  assert(isOpen, "auction is closed");
+  bidCount = (bidCount + 1) as Uint<64>;
+  // 入札額が現在の最高額より高いことをアサート
+  assert(disclose(amount) > highestBid, "bid too low");
+  highestBid = disclose(amount);
+}
+
+// 入札を締め切る
+export circuit close_bidding(): [] {
+  isOpen = false;
+}
+
+// 結果を公開
+export circuit reveal(): [] {
+  assert(!isOpen, "bidding is still open");
+  isRevealed = true;
+}
+
+// 最高入札額を取得
+export circuit get_highest_bid(): Uint<64> {
+  assert(isRevealed, "not revealed yet");
+  return highestBid;
+}
+
+// 入札数を取得
+export circuit get_bid_count(): Uint<64> {
+  return bidCount;
+}
+
+// オークションが公開されたか確認
+export circuit is_revealed(): Boolean {
+  return isRevealed;
+}

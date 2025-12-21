@@ -24,3 +24,4 @@ done
 echo "❌ Node did not become ready after $MAX_ATTEMPTS attempts"
 exit 1
 
+

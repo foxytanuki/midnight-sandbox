@@ -1,0 +1,56 @@
+// lottery.compact
+// シンプルな抽選コントラクト
+
+pragma language_version >= 0.17;
+
+// オンチェーン状態
+export ledger participantCount: Uint<64>;
+export ledger winnerNumber: Uint<64>;
+export ledger isDrawn: Boolean;
+export ledger isOpen: Boolean;
+
+// コントラクト初期化
+constructor() {
+  participantCount = 0 as Uint<64>;
+  winnerNumber = 0 as Uint<64>;
+  isDrawn = false;
+  isOpen = true;
+}
+
+// 抽選に参加
+export circuit enter(): [] {
+  assert(isOpen, "lottery is closed");
+  assert(!isDrawn, "already drawn");
+  participantCount = (participantCount + 1) as Uint<64>;
+}
+
+// 参加を締め切る
+export circuit close_entry(): [] {
+  isOpen = false;
+}
+
+// 抽選を実行（シンプルな実装：最初の参加者が当選）
+export circuit draw(): [] {
+  assert(!isOpen, "entry is still open");
+  assert(!isDrawn, "already drawn");
+  assert(participantCount > 0, "no participants");
+  // 簡易的な当選者決定（最初の参加者）
+  winnerNumber = 1 as Uint<64>;
+  isDrawn = true;
+}
+
+// 参加者数を取得
+export circuit get_participant_count(): Uint<64> {
+  return participantCount;
+}
+
+// 当選番号を取得
+export circuit get_winner(): Uint<64> {
+  assert(isDrawn, "not drawn yet");
+  return winnerNumber;
+}
+
+// 抽選が完了したか確認
+export circuit is_drawn(): Boolean {
+  return isDrawn;
+}

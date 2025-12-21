@@ -1,0 +1,56 @@
+// escrow.compact
+// シンプルなエスクローコントラクト
+
+pragma language_version >= 0.17;
+
+// 状態: 0=Created, 1=Funded, 2=Released, 3=Refunded
+export ledger state: Uint<8>;
+export ledger amount: Uint<64>;
+export ledger isFunded: Boolean;
+export ledger isCompleted: Boolean;
+
+// コントラクト初期化
+constructor() {
+  state = 0 as Uint<8>;
+  amount = 0 as Uint<64>;
+  isFunded = false;
+  isCompleted = false;
+}
+
+// 資金を預ける
+export circuit fund(depositAmount: Uint<64>): [] {
+  assert(state == 0, "already funded or completed");
+  amount = disclose(depositAmount);
+  state = 1 as Uint<8>;
+  isFunded = true;
+}
+
+// 資金を受取人に解放
+export circuit release(): [] {
+  assert(state == 1, "not funded");
+  state = 2 as Uint<8>;
+  isCompleted = true;
+}
+
+// 資金を送金者に返金
+export circuit refund(): [] {
+  assert(state == 1, "not funded");
+  state = 3 as Uint<8>;
+  isCompleted = true;
+}
+
+// 状態を取得
+export circuit get_state(): Uint<8> {
+  return state;
+}
+
+// 金額を取得
+export circuit get_amount(): Uint<64> {
+  return amount;
+}
+
+// 完了したか確認
+export circuit is_completed(): Boolean {
+  return isCompleted;
+}
+

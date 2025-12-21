@@ -1,0 +1,54 @@
+// voting.compact
+// シンプルな投票コントラクト（Yes/No投票）
+
+pragma language_version >= 0.17;
+
+// オンチェーン状態
+export ledger yesVotes: Uint<64>;
+export ledger noVotes: Uint<64>;
+export ledger totalVotes: Uint<64>;
+export ledger isOpen: Boolean;
+
+// コントラクト初期化
+constructor() {
+  yesVotes = 0 as Uint<64>;
+  noVotes = 0 as Uint<64>;
+  totalVotes = 0 as Uint<64>;
+  isOpen = true;
+}
+
+// Yesに投票
+export circuit vote_yes(): [] {
+  assert(isOpen, "voting is closed");
+  yesVotes = (yesVotes + 1) as Uint<64>;
+  totalVotes = (totalVotes + 1) as Uint<64>;
+}
+
+// Noに投票
+export circuit vote_no(): [] {
+  assert(isOpen, "voting is closed");
+  noVotes = (noVotes + 1) as Uint<64>;
+  totalVotes = (totalVotes + 1) as Uint<64>;
+}
+
+// 投票を締め切る
+export circuit close_voting(): [] {
+  isOpen = false;
+}
+
+// 結果を取得（Yes票）
+export circuit get_yes_votes(): Uint<64> {
+  return yesVotes;
+}
+
+// 結果を取得（No票）
+export circuit get_no_votes(): Uint<64> {
+  return noVotes;
+}
+
+// 投票総数を取得
+export circuit get_total_votes(): Uint<64> {
+  return totalVotes;
+}
+
+

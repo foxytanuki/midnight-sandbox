@@ -1,0 +1,41 @@
+// token.compact
+// シンプルなトークンコントラクト
+
+pragma language_version >= 0.17;
+
+// オンチェーン状態
+export ledger totalSupply: Uint<64>;
+export ledger ownerBalance: Uint<64>;
+
+// コントラクト初期化（オーナーに初期供給量を付与）
+constructor() {
+  totalSupply = 1000000 as Uint<64>;
+  ownerBalance = 1000000 as Uint<64>;
+}
+
+// トークンを発行（オーナーの残高を増やす）
+export circuit mint(amount: Uint<64>): [] {
+  const a = disclose(amount);
+  totalSupply = (totalSupply + a) as Uint<64>;
+  ownerBalance = (ownerBalance + a) as Uint<64>;
+}
+
+// トークンをバーン（オーナーの残高を減らす）
+export circuit burn(amount: Uint<64>): [] {
+  const a = disclose(amount);
+  assert(ownerBalance >= a, "insufficient balance");
+  totalSupply = (totalSupply - a) as Uint<64>;
+  ownerBalance = (ownerBalance - a) as Uint<64>;
+}
+
+// 残高を取得
+export circuit get_balance(): Uint<64> {
+  return ownerBalance;
+}
+
+// 総供給量を取得
+export circuit get_total_supply(): Uint<64> {
+  return totalSupply;
+}
+
+
