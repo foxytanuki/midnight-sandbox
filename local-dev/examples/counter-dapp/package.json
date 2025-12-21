@@ -4,23 +4,25 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "deploy": "node dist/deploy.js"
+    "deploy": "node dist/deploy.js",
+    "cli": "node dist/cli.js",
+    "run": "node dist/run-circuit.js"
   },
   "dependencies": {
-    "@midnight-ntwrk/compact-runtime": "latest",
-    "@midnight-ntwrk/ledger": "latest",
-    "@midnight-ntwrk/midnight-js-contracts": "latest",
-    "@midnight-ntwrk/midnight-js-http-client-proof-provider": "latest",
-    "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "latest",
-    "@midnight-ntwrk/midnight-js-level-private-state-provider": "latest",
-    "@midnight-ntwrk/midnight-js-node-zk-config-provider": "latest",
-    "@midnight-ntwrk/midnight-js-network-id": "latest",
-    "@midnight-ntwrk/midnight-js-types": "latest",
-    "@midnight-ntwrk/wallet": "latest",
-    "@midnight-ntwrk/wallet-api": "latest",
-    "@midnight-ntwrk/zswap": "latest",
-    "rxjs": "latest",
-    "ws": "latest"
+    "@midnight-ntwrk/compact-runtime": "^0.8.1",
+    "@midnight-ntwrk/ledger": "^4.0.0",
+    "@midnight-ntwrk/midnight-js-contracts": "2.0.2",
+    "@midnight-ntwrk/midnight-js-http-client-proof-provider": "2.0.2",
+    "@midnight-ntwrk/midnight-js-indexer-public-data-provider": "2.0.2",
+    "@midnight-ntwrk/midnight-js-level-private-state-provider": "2.0.2",
+    "@midnight-ntwrk/midnight-js-node-zk-config-provider": "2.0.2",
+    "@midnight-ntwrk/midnight-js-network-id": "2.0.2",
+    "@midnight-ntwrk/midnight-js-types": "2.0.2",
+    "@midnight-ntwrk/wallet": "5.0.0",
+    "@midnight-ntwrk/wallet-api": "5.0.0",
+    "@midnight-ntwrk/zswap": "^4.0.0",
+    "rxjs": "^7.8.0",
+    "ws": "^8.18.3"
   },
   "devDependencies": {
     "@types/node": "latest",
