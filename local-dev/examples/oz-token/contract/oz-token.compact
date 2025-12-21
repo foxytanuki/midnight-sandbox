@@ -1,0 +1,84 @@
+// oz-token.compact
+// OpenZeppelin Compact Contractsを使用したトークンコントラクト
+// Ownable, Pausable, FungibleTokenを組み合わせた例
+
+pragma language_version >= 0.18.0;
+
+import CompactStandardLibrary;
+import "../../../../submodules/compact-contracts/contracts/src/access/Ownable" prefix Ownable_;
+import "../../../../submodules/compact-contracts/contracts/src/security/Pausable" prefix Pausable_;
+import "../../../../submodules/compact-contracts/contracts/src/token/FungibleToken" prefix FungibleToken_;
+
+constructor(
+  _name: Opaque<"string">,
+  _symbol: Opaque<"string">,
+  _decimals: Uint<8>,
+  _recipient: Either<ZswapCoinPublicKey, ContractAddress>,
+  _amount: Uint<128>,
+  _initOwner: Either<ZswapCoinPublicKey, ContractAddress>,
+) {
+  Ownable_initialize(_initOwner);
+  FungibleToken_initialize(_name, _symbol, _decimals);
+  FungibleToken__mint(_recipient, _amount);
+}
+
+// トークンを転送（Pausableチェック付き）
+export circuit transfer(
+  to: Either<ZswapCoinPublicKey, ContractAddress>,
+  value: Uint<128>,
+): Boolean {
+  Pausable_assertNotPaused();
+  return FungibleToken_transfer(to, value);
+}
+
+// トークンを発行（オーナーのみ、Pausableチェック付き）
+export circuit mint(
+  to: Either<ZswapCoinPublicKey, ContractAddress>,
+  amount: Uint<128>,
+): [] {
+  Ownable_assertOnlyOwner();
+  Pausable_assertNotPaused();
+  FungibleToken__mint(to, amount);
+}
+
+// トークンをバーン（Pausableチェック付き）
+export circuit burn(
+  account: Either<ZswapCoinPublicKey, ContractAddress>,
+  amount: Uint<128>,
+): [] {
+  Pausable_assertNotPaused();
+  FungibleToken__burn(account, amount);
+}
+
+// コントラクトを一時停止（オーナーのみ）
+export circuit pause(): [] {
+  Ownable_assertOnlyOwner();
+  Pausable__pause();
+}
+
+// コントラクトの一時停止を解除（オーナーのみ）
+export circuit unpause(): [] {
+  Ownable_assertOnlyOwner();
+  Pausable__unpause();
+}
+
+// 残高を取得
+export circuit balanceOf(account: Either<ZswapCoinPublicKey, ContractAddress>): Uint<128> {
+  return FungibleToken_balanceOf(account);
+}
+
+// 総供給量を取得
+export circuit totalSupply(): Uint<128> {
+  return FungibleToken_totalSupply();
+}
+
+// オーナーを取得
+export circuit owner(): Either<ZswapCoinPublicKey, ContractAddress> {
+  return Ownable_owner();
+}
+
+// 一時停止状態を取得
+export circuit isPaused(): Boolean {
+  return Pausable_isPaused();
+}
+
