@@ -76,7 +76,7 @@ async function main() {
   setNetworkId(NetworkId.Undeployed);
 
   // Load contract
-  const contractPath = path.join(process.cwd(), "..", "counter", "out");
+  const contractPath = path.join(process.cwd(), "contract");
   const contractModulePath = path.join(contractPath, "contract", "index.cjs");
   const CounterModule = await import(contractModulePath);
   const contractInstance = new CounterModule.Contract({});

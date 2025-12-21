@@ -92,7 +92,7 @@ async function main() {
 
   // Load compiled contract
   console.log("Loading contract...");
-  const contractPath = path.join(process.cwd(), "..", "counter", "out");
+  const contractPath = path.join(process.cwd(), "contract");
   const contractModulePath = path.join(contractPath, "contract", "index.cjs");
 
   if (!fs.existsSync(contractModulePath)) {
