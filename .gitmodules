@@ -37,3 +37,6 @@
 [submodule "submodules/compact-contracts"]
 	path = submodules/compact-contracts
 	url = https://github.com/OpenZeppelin/compact-contracts.git
+[submodule "submodules/polkadot-js-apps"]
+	path = submodules/polkadot-js-apps
+	url = https://github.com/polkadot-js/apps.git
