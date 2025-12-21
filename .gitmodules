@@ -34,3 +34,6 @@
 [submodule "submodules/midnight-trusted-setup"]
 	path = submodules/midnight-trusted-setup
 	url = https://github.com/midnightntwrk/midnight-trusted-setup.git
+[submodule "submodules/compact-contracts"]
+	path = submodules/compact-contracts
+	url = https://github.com/OpenZeppelin/compact-contracts.git
