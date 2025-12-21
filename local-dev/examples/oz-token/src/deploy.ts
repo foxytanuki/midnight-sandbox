@@ -3,7 +3,7 @@ import * as path from "path";
 import * as Rx from "rxjs";
 import WebSocket from "ws";
 
-import { deployContract } from "@midnight-ntwrk/midnight-js-contracts";
+import { deployContract, type DeployContractOptionsWithPrivateState } from "@midnight-ntwrk/midnight-js-contracts";
 import { createBalancedTx } from "@midnight-ntwrk/midnight-js-types";
 import { levelPrivateStateProvider } from "@midnight-ntwrk/midnight-js-level-private-state-provider";
 import { indexerPublicDataProvider } from "@midnight-ntwrk/midnight-js-indexer-public-data-provider";
@@ -161,15 +161,15 @@ async function main() {
     contract: contractInstance,
     privateStateId: "ozTokenState",
     initialPrivateState: {},
-    constructorArgs: {
-      _name: name,
-      _symbol: symbol,
-      _decimals: decimals,
-      _recipient: recipient,
-      _amount: initialAmount,
-      _initOwner: initOwner,
-    }
-  });
+    args: [
+      name,
+      symbol,
+      decimals,
+      recipient,
+      initialAmount,
+      initOwner,
+    ]
+  } as any);
 
   const contractAddress = deployed.deployTxData.public.contractAddress;
 
@@ -198,4 +198,5 @@ main().catch((error) => {
   console.error("Deployment failed:", error);
   process.exit(1);
 });
+
 
