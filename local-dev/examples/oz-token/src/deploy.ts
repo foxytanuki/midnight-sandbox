@@ -18,6 +18,8 @@ import {
 import { WalletBuilder } from "@midnight-ntwrk/wallet";
 import { nativeToken, Transaction } from "@midnight-ntwrk/ledger";
 import { Transaction as ZswapTransaction } from "@midnight-ntwrk/zswap";
+import { encodeCoinPublicKey } from "@midnight-ntwrk/compact-runtime";
+import { parseCoinPublicKeyToHex } from "@midnight-ntwrk/midnight-js-utils";
 
 // Fix WebSocket for Node.js environment
 // @ts-ignore
@@ -60,7 +62,7 @@ async function main() {
   // Load compiled contract
   console.log("Loading contract...");
   const contractPath = path.join(process.cwd(), "contract");
-  const contractModulePath = path.join(contractPath, "contract", "index.cjs");
+  const contractModulePath = path.join(contractPath, "oz-token", "contract", "index.cjs");
 
   if (!fs.existsSync(contractModulePath)) {
     console.error("Contract not found! Make sure contract is compiled.");
@@ -123,7 +125,7 @@ async function main() {
 
   // Configure providers
   console.log("\nSetting up providers...");
-  const zkConfigPath = path.join(contractPath);
+  const zkConfigPath = path.join(contractPath, "oz-token");
   const providers = {
     privateStateProvider: levelPrivateStateProvider({
       privateStateStoreName: "oz-token-state"
@@ -141,10 +143,24 @@ async function main() {
   // Prepare constructor arguments
   const name = "OpenZeppelin Token";
   const symbol = "OZT";
-  const decimals = 18;
+  const decimals = 18n; // Uint<8> requires bigint
   const initialAmount = 1000000n; // 1,000,000 tokens
-  const recipient = walletState.coinPublicKey;
-  const initOwner = walletState.coinPublicKey;
+  
+  // Convert coinPublicKey to ZswapCoinPublicKey format
+  const coinPublicKeyHex = parseCoinPublicKeyToHex(walletState.coinPublicKey, getZswapNetworkId());
+  const zswapCoinPublicKey = { bytes: encodeCoinPublicKey(coinPublicKeyHex) };
+  
+  // Create Either<ZswapCoinPublicKey, ContractAddress> for recipient and owner
+  const recipient = {
+    is_left: true,
+    left: zswapCoinPublicKey,
+    right: { bytes: new Uint8Array(32) } // empty ContractAddress
+  };
+  const initOwner = {
+    is_left: true,
+    left: zswapCoinPublicKey,
+    right: { bytes: new Uint8Array(32) } // empty ContractAddress
+  };
 
   console.log("\nConstructor arguments:");
   console.log(`  Name: ${name}`);
@@ -182,7 +198,7 @@ async function main() {
     deployedAt: new Date().toISOString(),
     name,
     symbol,
-    decimals,
+    decimals: decimals.toString(),
     initialAmount: initialAmount.toString(),
   };
 
