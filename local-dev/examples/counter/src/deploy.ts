@@ -3,7 +3,7 @@ import * as path from "path";
 import * as Rx from "rxjs";
 import WebSocket from "ws";
 
-import { deployContract } from "@midnight-ntwrk/midnight-js-contracts";
+import { deployContract, DeployTxFailedError } from "@midnight-ntwrk/midnight-js-contracts";
 import { createBalancedTx } from "@midnight-ntwrk/midnight-js-types";
 import { levelPrivateStateProvider } from "@midnight-ntwrk/midnight-js-level-private-state-provider";
 import { indexerPublicDataProvider } from "@midnight-ntwrk/midnight-js-indexer-public-data-provider";
@@ -167,7 +167,53 @@ async function main() {
 }
 
 main().catch((error) => {
-  console.error("Deployment failed:", error);
+  console.error("\n❌ Deployment failed!");
+  
+  if (error instanceof DeployTxFailedError) {
+    console.error("\n=== Deployment Transaction Failure Details ===");
+    console.error(`Status: ${error.finalizedTxData.status}`);
+    console.error(`Transaction ID: ${error.finalizedTxData.txId}`);
+    console.error(`Transaction Hash: ${error.finalizedTxData.txHash}`);
+    console.error(`Block Height: ${error.finalizedTxData.blockHeight}`);
+    console.error(`Block Hash: ${error.finalizedTxData.blockHash}`);
+    
+    console.error("\nPossible causes:");
+    console.error("1. Contract compilation issue");
+    console.error("2. Missing key files for deploy transaction");
+    console.error("3. Incorrect network configuration");
+    console.error("4. Transaction construction issue");
+    
+    console.error("\nCheck items:");
+    const contractPath = path.join(process.cwd(), "contract");
+    const keysDir = path.join(contractPath, "keys");
+    console.error(`- Contract path: ${contractPath}`);
+    console.error(`- Keys directory: ${keysDir}`);
+    
+    if (fs.existsSync(keysDir)) {
+      const keys = fs.readdirSync(keysDir);
+      console.error(`- Number of key files: ${keys.length}`);
+      if (keys.length > 0) {
+        console.error(`- Key files: ${keys.join(", ")}`);
+      }
+    } else {
+      console.error(`- ⚠️ Keys directory does not exist`);
+    }
+    
+    const zkirDir = path.join(contractPath, "zkir");
+    if (fs.existsSync(zkirDir)) {
+      const zkirFiles = fs.readdirSync(zkirDir);
+      console.error(`- Number of ZKIR files: ${zkirFiles.length}`);
+    } else {
+      console.error(`- ⚠️ ZKIR directory does not exist`);
+    }
+  } else {
+    console.error("Error:", error);
+    if (error instanceof Error) {
+      console.error("Error message:", error.message);
+      console.error("Error stack:", error.stack);
+    }
+  }
+  
   process.exit(1);
 });
 
