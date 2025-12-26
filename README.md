@@ -2,6 +2,27 @@
 
 [Midnight](https://midnight.network/) Hands-on Notes
 
+This repository is a sandbox that consolidates development environments and tools for Midnight Network.
+
+## Project Structure
+
+```
+midnight-sandbox/
+├── rpc/                    # RPC CLI Tool
+│   ├── README.md           # RPC CLI Usage
+│   ├── RPC_API.md         # RPC API Reference
+│   └── INDEXER.md         # Indexer Details
+├── frontend/               # RPC Explorer (Web UI)
+│   └── README.md          # Frontend Usage
+├── local-dev/             # Local Development Environment
+│   ├── README.md          # Local Development Setup
+│   ├── compose.yaml       # Docker Compose Configuration
+│   └── examples/          # Sample Code
+├── docs/                  # Documentation
+│   ├── en/                # English Version
+│   └── ja/                # Japanese Version
+└── submodules/            # Midnight-related Submodules
+```
 
 ## Setup Prerequisites
 
@@ -54,70 +75,131 @@ docker run -p 6300:6300 midnightnetwork/proof-server -- 'midnight-proof-server -
 
 ### Setup Indexer
 
-> The Midnight Network indexer efficiently collects and indexes blockchain data, making it accessible through a GraphQL API.
+The Midnight Network indexer efficiently collects and indexes blockchain data, making it accessible through a GraphQL API.
 
-See [rpc/INDEXER.md](./rpc/INDEXER.md) for details.
+For detailed setup instructions, see [local-dev/README.md](./local-dev/README.md) and [rpc/INDEXER.md](./rpc/INDEXER.md).
 
-#### Connecting to Testnet
+## Tools and Components in This Project
+
+### RPC CLI Tool (`rpc/`)
+
+A command-line interface tool for interacting with Midnight Network RPC endpoints.
+
+**Key Features:**
+- Call all RPC methods from the command line
+- Transaction search functionality (`search-tx`)
+- Account address transaction search (`search-account`)
+
+**Usage:**
 
 ```bash
-docker-compose -f docker-compose.indexer.yml up -d
+cd rpc
+pnpm install
+pnpm run dev -- system_chain
+pnpm run dev -- search-tx <transaction_hash>
 ```
 
-Once the Indexer starts, the GraphQL API will be available at `http://localhost:8088/graphql`.
+See [rpc/README.md](./rpc/README.md) for details.
 
-#### Starting with Local Node
+### Frontend RPC Explorer (`frontend/`)
+
+A web interface for interacting with Midnight Network RPC endpoints.
+
+**Key Features:**
+- Call all RPC methods from the browser
+- Parameter input forms
+- JSON response display
+
+**Usage:**
 
 ```bash
-docker-compose -f docker-compose.indexer-local.yml up -d
+cd frontend
+pnpm install
+pnpm dev
 ```
 
-This will start both the local Midnight Node and Indexer.
+Open `http://localhost:5173` in your browser.
+
+See [frontend/README.md](./frontend/README.md) for details.
+
+### Local Development Environment (`local-dev/`)
+
+A complete environment for developing Midnight dApps locally.
+
+**Included Components:**
+- Midnight Node (localhost:9944)
+- Indexer (localhost:8088)
+- Proof Server (localhost:6300)
+
+**Usage:**
+
+```bash
+cd local-dev
+make up      # Start the environment
+make status  # Check status
+make down    # Stop the environment
+```
+
+See [local-dev/README.md](./local-dev/README.md) for details.
+
+### Documentation (`docs/`)
+
+Technical documentation for Midnight Network, designed for EVM/Solana developers.
+
+**Contents:**
+- Architecture overview
+- Core concepts (zero-knowledge proofs, Zswap, state management)
+- Complete guide to Compact language
+- SDK development guide
+- Infrastructure setup and operations
+
+See [docs/README.md](./docs/README.md) for details.
 
 ## Build a DApp
+
+### Required Tools
 
 ```
 ❯ node -v
 v22.15.1
 ```
 
-Install the developer tools
+### Install Compact Compiler
 
-```
+```bash
 curl --proto '=https' --tlsv1.2 -LsSf https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
 ```
 
-Update
+**Update:**
 
-```
-❯ compact update
-compact: x86_64-unknown-linux-musl -- 0.25.0 -- installed
-compact: x86_64-unknown-linux-musl -- 0.25.0 -- default.
-```
-
-```
-❯ compact compile --version
-0.25.0
+```bash
+compact update
+compact compile --version
 ```
 
-Cloned the example repository as described in [the official documentation](https://docs.midnight.network/develop/tutorial/building/examples-repo)
+### Sample Projects
 
-It says "You will be using Yarn" but the following tutorial documents are using npm, so I decided to use npm.
+Clone the example repository as described in the official documentation:
 
-### Build the counter DApp
+https://docs.midnight.network/develop/tutorial/building/examples-repo
+
+**Note:** The official documentation mentions using Yarn, but the tutorial documents use npm, so we recommend using npm.
+
+### Build the Counter DApp
 
 https://docs.midnight.network/develop/tutorial/building/counter-build
 
-**Note:** The official documentation instructs to run `npm run compile` in the `contract` folder, but there is no `compile` script defined.  
-Instead, use the following command to compile and test the contract:
+**Note:** The official documentation instructs to run `npm run compile` in the `contract` folder, but there is no `compile` script defined. Instead, use the following command:
 
-```
+```bash
 npm run compact && npm run build
 ```
 
----
+## RPC API Usage Examples
 
-```
+### Get Chain Name
+
+```bash
 curl -X POST \
   -H "Content-Type: application/json" \
   -d '{
@@ -128,6 +210,14 @@ curl -X POST \
       }' \
   https://rpc.testnet-02.midnight.network/
 ```
+
+See [rpc/RPC_API.md](./rpc/RPC_API.md) for detailed RPC API reference.
+
+## Reference Links
+
+- [Midnight Network Official Site](https://midnight.network/)
+- [Midnight Network Official Documentation](https://docs.midnight.network/)
+- [Midnight Network GitHub](https://github.com/midnightntwrk)
 
 
 
