@@ -25,7 +25,7 @@ services:
 
   # Indexer - GraphQL API for querying chain state
   indexer:
-    image: midnightntwrk/indexer-standalone:latest
+    image: midnightntwrk/indexer-standalone:2.1.4-b49e3d9a
     container_name: midnight-indexer
     ports:
       - "8088:8088"
@@ -42,7 +42,7 @@ services:
 
   # Proof Server - ZK proof generation
   proof-server:
-    image: midnightnetwork/proof-server:latest
+    image: midnightnetwork/proof-server:4.0.0
     container_name: midnight-proof-server
     ports:
       - "6300:6300"
