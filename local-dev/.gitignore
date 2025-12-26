@@ -1,6 +1,9 @@
 # Compiled contracts
 examples/*/out/
 
+# Deployment files (local development only)
+examples/*/deployment.json
+
 # Environment
 .env
 .envrc.local
