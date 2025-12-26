@@ -17,10 +17,19 @@
 
 ```bash
 # Docker イメージを使用（推奨）
-docker pull midnightntwrk/midnight-node-toolkit:latest
+# 最新の安定版を使用
+docker pull midnightntwrk/midnight-node-toolkit:latest-main
 
 # エイリアス設定
-alias toolkit='docker run --network host -v $(pwd):/work -w /work midnightntwrk/midnight-node-toolkit:latest'
+alias toolkit='docker run --network host -v $(pwd):/work -w /work midnightntwrk/midnight-node-toolkit:latest-main'
+```
+
+特定のバージョンを使用する場合：
+
+```bash
+# 例: バージョン 0.18.0-rc.7
+docker pull midnightntwrk/midnight-node-toolkit:0.18.0-rc.7
+alias toolkit='docker run --network host -v $(pwd):/work -w /work midnightntwrk/midnight-node-toolkit:0.18.0-rc.7'
 ```
 
 ## 基本コマンド

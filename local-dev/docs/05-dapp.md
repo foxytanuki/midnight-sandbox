@@ -23,45 +23,114 @@ npm init -y
 npm install \
   @midnight-ntwrk/midnight-js-contracts \
   @midnight-ntwrk/midnight-js-types \
+  @midnight-ntwrk/midnight-js-level-private-state-provider \
   @midnight-ntwrk/midnight-js-indexer-public-data-provider \
   @midnight-ntwrk/midnight-js-http-client-proof-provider \
-  @midnight-ntwrk/midnight-js-fetch-zk-config-provider \
-  @midnight-ntwrk/wallet
+  @midnight-ntwrk/midnight-js-node-zk-config-provider \
+  @midnight-ntwrk/midnight-js-network-id \
+  @midnight-ntwrk/wallet \
+  @midnight-ntwrk/ledger \
+  @midnight-ntwrk/zswap \
+  rxjs \
+  ws
 ```
 
 ## 基本構成
 
 ```typescript
-import { 
-  ContractState,
-  deployContract,
-  callCircuit 
-} from '@midnight-ntwrk/midnight-js-contracts';
+import * as Rx from "rxjs";
+import WebSocket from "ws";
 
+import { deployContract, findDeployedContract } from "@midnight-ntwrk/midnight-js-contracts";
+import { createBalancedTx } from "@midnight-ntwrk/midnight-js-types";
+import { levelPrivateStateProvider } from "@midnight-ntwrk/midnight-js-level-private-state-provider";
+import { indexerPublicDataProvider } from "@midnight-ntwrk/midnight-js-indexer-public-data-provider";
+import { httpClientProofProvider } from "@midnight-ntwrk/midnight-js-http-client-proof-provider";
+import { NodeZkConfigProvider } from "@midnight-ntwrk/midnight-js-node-zk-config-provider";
 import { 
-  createIndexerPublicDataProvider 
-} from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
+  setNetworkId, 
+  NetworkId,
+  getLedgerNetworkId,
+  getZswapNetworkId 
+} from "@midnight-ntwrk/midnight-js-network-id";
+import { WalletBuilder } from "@midnight-ntwrk/wallet";
+import { nativeToken, Transaction } from "@midnight-ntwrk/ledger";
+import { Transaction as ZswapTransaction } from "@midnight-ntwrk/zswap";
 
-import { 
-  createProofClient 
-} from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
+// Fix WebSocket for Node.js environment
+// @ts-ignore
+globalThis.WebSocket = WebSocket;
 ```
 
 ## プロバイダー設定
 
 ```typescript
-// ローカル開発用設定
-const config = {
-  nodeUrl: 'ws://localhost:9944',
-  indexerUrl: 'http://localhost:8088/graphql',
-  proofServerUrl: 'http://localhost:6300',
+// ローカル環境用の設定
+const LOCAL_CONFIG = {
+  indexer: "http://localhost:8088/api/v1/graphql",
+  indexerWS: "ws://localhost:8088/api/v1/graphql/ws",
+  node: "http://localhost:9944",
+  proofServer: "http://localhost:6300"
 };
 
-// Indexer プロバイダー
-const indexerProvider = createIndexerPublicDataProvider(config.indexerUrl);
+// ネットワークID設定
+setNetworkId(NetworkId.Undeployed);
 
-// Proof Server プロバイダー
-const proofProvider = createProofClient(config.proofServerUrl);
+// ウォレット構築
+const wallet = await WalletBuilder.buildFromSeed(
+  LOCAL_CONFIG.indexer,
+  LOCAL_CONFIG.indexerWS,
+  LOCAL_CONFIG.proofServer,
+  LOCAL_CONFIG.node,
+  GENESIS_SEED,
+  getZswapNetworkId(),
+  "info"
+);
+
+await wallet.start();
+
+// ウォレットプロバイダー作成
+const walletState: any = await Rx.firstValueFrom(wallet.state());
+const walletProvider = {
+  coinPublicKey: walletState.coinPublicKey,
+  encryptionPublicKey: walletState.encryptionPublicKey,
+  balanceTx(tx: any, newCoins: any): Promise<any> {
+    return wallet
+      .balanceTransaction(
+        ZswapTransaction.deserialize(
+          tx.serialize(getLedgerNetworkId()),
+          getZswapNetworkId()
+        ),
+        newCoins
+      )
+      .then((result: any) => wallet.proveTransaction(result))
+      .then((zswapTx: any) =>
+        Transaction.deserialize(
+          zswapTx.serialize(getZswapNetworkId()),
+          getLedgerNetworkId()
+        )
+      )
+      .then(createBalancedTx);
+  },
+  submitTx(tx: any): Promise<any> {
+    return wallet.submitTransaction(tx);
+  }
+};
+
+// プロバイダー設定
+const providers = {
+  privateStateProvider: levelPrivateStateProvider({
+    privateStateStoreName: "my-dapp-state"
+  }),
+  publicDataProvider: indexerPublicDataProvider(
+    LOCAL_CONFIG.indexer,
+    LOCAL_CONFIG.indexerWS
+  ),
+  zkConfigProvider: new NodeZkConfigProvider(contractPath),
+  proofProvider: httpClientProofProvider(LOCAL_CONFIG.proofServer),
+  walletProvider: walletProvider,
+  midnightProvider: walletProvider
+};
 ```
 
 ## コントラクト操作
@@ -69,61 +138,100 @@ const proofProvider = createProofClient(config.proofServerUrl);
 ### デプロイ
 
 ```typescript
-import { Contract } from './contract/index.js';
-import { witnesses } from './contract/witnesses.js';
+// コンパイル済みコントラクトを読み込み
+const contractPath = path.join(process.cwd(), "contract");
+const contractModulePath = path.join(contractPath, "contract", "index.cjs");
+const ContractModule = await import(contractModulePath);
+const contractInstance = new ContractModule.Contract({});
 
-const deployedContract = await deployContract(
-  providers,
-  {
-    contract: Contract,
-    initialPrivateState: { count: 0 },
-    witnesses,
-  }
-);
+// デプロイ
+const deployed = await deployContract(providers, {
+  contract: contractInstance,
+  privateStateId: "myContractState",
+  initialPrivateState: {}
+});
+
+const contractAddress = deployed.deployTxData.public.contractAddress;
+console.log('Contract deployed at:', contractAddress);
+```
+
+### 既存コントラクトへの接続
+
+```typescript
+// deployment.json からアドレスを読み込み
+const deployment = JSON.parse(fs.readFileSync("deployment.json", "utf-8"));
+
+// コントラクトに接続
+const deployed = await findDeployedContract(providers, {
+  contractAddress: deployment.contractAddress,
+  contract: contractInstance,
+  privateStateId: "myContractState",
+  initialPrivateState: {}
+});
 ```
 
 ### Circuit 呼び出し
 
 ```typescript
-const result = await callCircuit(
-  deployedContract,
-  'increment',  // circuit 名
-  []            // 引数
-);
+// increment を呼び出し
+await deployed.callTx.increment();
+
+// 引数付きの呼び出し
+await deployed.callTx.add(5n);
+
+// 戻り値のある呼び出し
+const result = await deployed.callTx.get_count();
+console.log('Count:', result.callResult?.private?.result);
 ```
 
 ### 状態取得
 
 ```typescript
-const state = await deployedContract.queryContractState();
-console.log('Current count:', state.count);
+// Ledger 状態を取得
+const ledgerState = ContractModule.ledger(deployed.state.data);
+console.log('Current count:', ledgerState.count);
 ```
 
 ## ウォレット連携
 
 ```typescript
 import { WalletBuilder } from '@midnight-ntwrk/wallet';
+import { nativeToken } from '@midnight-ntwrk/ledger';
+import * as Rx from "rxjs";
 
-// ウォレット作成
-const wallet = await WalletBuilder.build({
-  indexerUrl: config.indexerUrl,
-  nodeUrl: config.nodeUrl,
-});
+// ウォレット作成（シードから）
+const GENESIS_SEED = "0000000000000000000000000000000000000000000000000000000000000001";
+const wallet = await WalletBuilder.buildFromSeed(
+  LOCAL_CONFIG.indexer,
+  LOCAL_CONFIG.indexerWS,
+  LOCAL_CONFIG.proofServer,
+  LOCAL_CONFIG.node,
+  GENESIS_SEED,
+  getZswapNetworkId(),
+  "info"
+);
+
+await wallet.start();
 
 // 残高確認
-const balance = await wallet.getBalance();
+const walletState: any = await Rx.firstValueFrom(wallet.state());
+const balance = walletState.balances[nativeToken()] ?? 0n;
+console.log('Balance:', balance);
+
+// ウォレットを閉じる
+await wallet.close();
 ```
 
 ## イベント購読
 
 ```typescript
-// ブロックイベント購読
-const subscription = indexerProvider.subscribeToBlocks({
-  onBlock: (block) => {
-    console.log('New block:', block.height);
-  },
-  onError: (error) => {
-    console.error('Subscription error:', error);
+// ウォレット状態の購読
+const subscription = wallet.state().subscribe((state: any) => {
+  if (state.syncProgress) {
+    console.log('Sync progress:', state.syncProgress);
+  }
+  if (state.balances) {
+    console.log('Balance:', state.balances[nativeToken()] ?? 0n);
   }
 });
 
@@ -135,29 +243,67 @@ subscription.unsubscribe();
 
 ```tsx
 import { useState, useEffect } from 'react';
-import { Contract } from './contract/index.js';
+import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
+// ... 他のインポート
 
 function CounterApp() {
   const [count, setCount] = useState(0);
-  const [contract, setContract] = useState(null);
+  const [deployed, setDeployed] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // コントラクト接続
     const connect = async () => {
-      const deployed = await connectToContract(CONTRACT_ADDRESS);
-      setContract(deployed);
-      
-      const state = await deployed.queryContractState();
-      setCount(state.count);
+      try {
+        // プロバイダー設定（上記参照）
+        const providers = { /* ... */ };
+        
+        // コントラクト読み込み
+        const ContractModule = await import('./contract/contract/index.cjs');
+        const contractInstance = new ContractModule.Contract({});
+        
+        // deployment.json から読み込み
+        const deployment = JSON.parse(
+          await fetch('/deployment.json').then(r => r.text())
+        );
+        
+        // コントラクトに接続
+        const deployedContract = await findDeployedContract(providers, {
+          contractAddress: deployment.contractAddress,
+          contract: contractInstance,
+          privateStateId: "counterState",
+          initialPrivateState: {}
+        });
+        
+        setDeployed(deployedContract);
+        
+        // 初期状態を取得
+        const ledgerState = ContractModule.ledger(deployedContract.state.data);
+        setCount(Number(ledgerState.count));
+      } catch (error) {
+        console.error('Connection failed:', error);
+      } finally {
+        setLoading(false);
+      }
     };
     connect();
   }, []);
 
   const handleIncrement = async () => {
-    await callCircuit(contract, 'increment', []);
-    const state = await contract.queryContractState();
-    setCount(state.count);
+    if (!deployed) return;
+    
+    try {
+      await deployed.callTx.increment();
+      
+      // 状態を更新
+      const ledgerState = ContractModule.ledger(deployed.state.data);
+      setCount(Number(ledgerState.count));
+    } catch (error) {
+      console.error('Increment failed:', error);
+    }
   };
+
+  if (loading) return <div>Loading...</div>;
 
   return (
     <div>
@@ -173,23 +319,25 @@ function CounterApp() {
 ```
 my-midnight-dapp/
 ├── contract/
-│   ├── counter.compact      # Compact ソース
-│   └── out/                  # コンパイル出力
-│       ├── index.js
-│       ├── index.d.ts
-│       └── managed/
+│   ├── counter.compact           # Compact ソース
+│   └── counter/                   # コンパイル出力
+│       └── contract/
+│           ├── index.cjs          # コントラクトランタイム
+│           ├── index.d.cts       # TypeScript 型定義
+│           └── ...
 ├── src/
-│   ├── providers.ts          # プロバイダー設定
-│   ├── contract.ts           # コントラクト操作
-│   └── App.tsx               # UI
+│   ├── deploy.ts                  # デプロイスクリプト
+│   ├── cli.ts                     # CLI インターフェース
+│   └── App.tsx                    # UI（React の場合）
+├── deployment.json                # デプロイ情報
 ├── package.json
 └── tsconfig.json
 ```
 
 ## 参考
 
-- [example-counter](../../example-counter/) - 完全なサンプル
-- [midnight-js README](../submodules/midnight-js/README.md)
+- [examples/counter](../examples/counter/) - 完全なサンプル
+- [04-deploy.md](04-deploy.md) - デプロイ方法の詳細
 
 ## 次のステップ
 

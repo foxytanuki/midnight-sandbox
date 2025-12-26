@@ -12,9 +12,29 @@ Compact は Midnight 専用のスマートコントラクト言語です。以�
 
 ## インストール
 
+最新の Compact 開発ツールをインストール：
+
 ```bash
 curl --proto '=https' --tlsv1.2 -LsSf \
-  https://github.com/midnightntwrk/compact/releases/download/compact-v0.3.0/compact-installer.sh | sh
+  https://github.com/midnightntwrk/compact/releases/latest/download/compact-installer.sh | sh
+```
+
+インストール後、PATH に追加する必要があります（インストーラーが指示を表示します）：
+
+```bash
+export PATH="$HOME/.cargo/bin:$PATH"
+```
+
+新しいターミナルを開くか、シェル設定を再読み込み後、最新のツールチェーンを更新：
+
+```bash
+compact update
+```
+
+インストール確認：
+
+```bash
+compact compile --version
 ```
 
 ## Hello World: Counter コントラクト
@@ -44,15 +64,24 @@ export circuit get_count(): Unsigned Integer {
 
 ```bash
 # コンパイル
-compact compile counter.compact out/
+compact compile counter.compact counter/
 
-# 出力ファイル
-# out/
-# ├── index.js          # コントラクトランタイム
-# ├── index.d.ts        # TypeScript 型定義
-# ├── witnesses.js      # ウィットネス定義
-# └── managed/          # ZK キー等
+# 出力ファイル構造
+# counter/
+# ├── contract/
+# │   ├── index.cjs          # コントラクトランタイム
+# │   ├── index.d.cts        # TypeScript 型定義
+# │   └── ...
+# ├── keys/                  # ZK 証明キー
+# │   ├── increment.prover
+# │   ├── increment.verifier
+# │   └── ...
+# └── zkir/                  # ZK 中間表現
+#     ├── increment.zkir
+#     └── ...
 ```
+
+コンパイル後、`counter/contract/index.cjs` が生成されます。このファイルを midnight-js でインポートして使用します。
 
 ## 主要な概念
 
