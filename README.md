@@ -54,25 +54,25 @@ docker run -p 6300:6300 midnightnetwork/proof-server -- 'midnight-proof-server -
 
 ### Setup Indexer
 
-> Midnight Networkのindexerは、ブロックチェーンデータを効率的に収集・インデックス化し、GraphQL APIを通じてアクセスできるようにします。
+> The Midnight Network indexer efficiently collects and indexes blockchain data, making it accessible through a GraphQL API.
 
-詳細は [rpc/INDEXER.md](./rpc/INDEXER.md) を参照してください。
+See [rpc/INDEXER.md](./rpc/INDEXER.md) for details.
 
-#### テストネットに接続する場合
+#### Connecting to Testnet
 
 ```bash
 docker-compose -f docker-compose.indexer.yml up -d
 ```
 
-Indexerが起動すると、`http://localhost:8088/graphql` でGraphQL APIが利用可能になります。
+Once the Indexer starts, the GraphQL API will be available at `http://localhost:8088/graphql`.
 
-#### ローカルノードと一緒に起動する場合
+#### Starting with Local Node
 
 ```bash
 docker-compose -f docker-compose.indexer-local.yml up -d
 ```
 
-これにより、ローカルのMidnight NodeとIndexerの両方が起動します。
+This will start both the local Midnight Node and Indexer.
 
 ## Build a DApp
 

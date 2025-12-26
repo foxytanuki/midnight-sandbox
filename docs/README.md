@@ -12,14 +12,14 @@ A technical guide for the Midnight blockchain, designed for developers with expe
 
 | Chapter | Title | Content |
 |---------|-------|---------|
-| [00](./00-introduction.md) | **Introduction** | Midnight overview, differences from EVM/Solana, why choose it |
-| [01](./01-architecture.md) | **Architecture** | System overview, component relationships, data flow |
-| [02](./02-core-concepts.md) | **Core Concepts** | Zero-knowledge proofs, Zswap, state management details |
-| [03](./03-compact-language.md) | **Compact Language** | Complete guide to smart contract language |
-| [04](./04-sdk-development.md) | **SDK Development** | midnight-js, wallet integration, React integration |
-| [05](./05-infrastructure.md) | **Infrastructure** | Node and Indexer setup and operations |
-| [06](./06-comparison.md) | **Comparison Guide** | Detailed comparison with EVM/Solana, migration patterns |
-| [07](./07-resources.md) | **Resources** | Official resources, learning roadmap |
+| [00](./en/00-introduction.md) | **Introduction** | Midnight overview, differences from EVM/Solana, why choose it |
+| [01](./en/01-architecture.md) | **Architecture** | System overview, component relationships, data flow |
+| [02](./en/02-core-concepts.md) | **Core Concepts** | Zero-knowledge proofs, Zswap, state management details |
+| [03](./en/03-compact-language.md) | **Compact Language** | Complete guide to smart contract language |
+| [04](./en/04-sdk-development.md) | **SDK Development** | midnight-js, wallet integration, React integration |
+| [05](./en/05-infrastructure.md) | **Infrastructure** | Node and Indexer setup and operations |
+| [06](./en/06-comparison.md) | **Comparison Guide** | Detailed comparison with EVM/Solana, migration patterns |
+| [07](./en/07-resources.md) | **Resources** | Official resources, learning roadmap |
 
 ## Quick Start
 
