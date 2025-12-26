@@ -1,30 +1,30 @@
 # Midnight Local Development Environment
 
-A setup guide for Midnight dApp development on a local chain.
+ローカルチェーンでの Midnight dApp 開発環境のセットアップガイドです。
 
-## Quick Start
+## クイックスタート
 
 ```bash
-# 1. Start local node
+# 1. ローカルノード起動
 make up
 
-# 2. Check status
+# 2. 状態確認
 make status
 
-# 3. Stop
+# 3. 停止
 make down
 ```
 
-## Required Tools
+## 必要なツール
 
-| Tool | Purpose | Installation |
-|------|---------|--------------|
-| direnv | Automatic environment variable setup | [direnv.net](https://direnv.net/) |
-| Docker | Node and indexer execution | [docker.com](https://docker.com) |
-| Node.js 20+ | dApp development | [nvm](https://github.com/nvm-sh/nvm) |
-| compact | Compact compilation | [See below](#compact-compiler) |
+| ツール | 用途 | インストール |
+|--------|------|-------------|
+| direnv | 環境変数の自動設定 | [direnv.net](https://direnv.net/) |
+| Docker | ノード・インデクサー実行 | [docker.com](https://docker.com) |
+| Node.js 20+ | dApp 開発 | [nvm](https://github.com/nvm-sh/nvm) |
+| compact | Compact コンパイル | [後述](#compact-コンパイラ) |
 
-## Architecture
+## アーキテクチャ
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -46,68 +46,69 @@ make down
                     └─────────────────┘
 ```
 
-## Documentation
+## ドキュメント
 
-| Document | Content |
-|----------|---------|
-| [01-setup.md](docs/en/01-setup.md) | Environment setup |
-| [02-node.md](docs/en/02-node.md) | Starting the local node |
-| [03-compact.md](docs/en/03-compact.md) | Compact language introduction |
-| [04-deploy.md](docs/en/04-deploy.md) | Contract deployment |
-| [05-dapp.md](docs/en/05-dapp.md) | dApp development with midnight-js |
-| [06-toolkit.md](docs/en/06-toolkit.md) | Toolkit usage |
+| ドキュメント | 内容 |
+|-------------|------|
+| [01-setup.md](docs/ja/01-setup.md) | 環境セットアップ |
+| [02-node.md](docs/ja/02-node.md) | ローカルノードの起動 |
+| [03-compact.md](docs/ja/03-compact.md) | Compact 言語入門 |
+| [04-deploy.md](docs/ja/04-deploy.md) | コントラクトデプロイ |
+| [05-dapp.md](docs/ja/05-dapp.md) | midnight-js で dApp 開発 |
+| [06-toolkit.md](docs/ja/06-toolkit.md) | Toolkit の使い方 |
 
-## Compact Compiler
+## Compact コンパイラ
 
 ```bash
-# Install
+# インストール
 curl --proto '=https' --tlsv1.2 -LsSf \
   https://github.com/midnightntwrk/compact/releases/download/compact-v0.3.0/compact-installer.sh | sh
 
-# Verify
+# 確認
 compact -V
 ```
 
-## Endpoint List
+## エンドポイント一覧
 
-| Service | URL | Purpose |
-|---------|-----|---------|
-| Node RPC | `ws://localhost:9944` | Transaction submission |
-| Indexer GraphQL | `http://localhost:8088/graphql` | State queries |
-| Proof Server | `http://localhost:6300` | ZK proof generation |
+| サービス | URL | 用途 |
+|----------|-----|------|
+| Node RPC | `ws://localhost:9944` | トランザクション送信 |
+| Indexer GraphQL | `http://localhost:8088/graphql` | 状態クエリ |
+| Proof Server | `http://localhost:6300` | ZK証明生成 |
 
-## Directory Structure
+## ディレクトリ構成
 
 ```
 local-dev/
-├── README.md              # This file (English)
-├── README.ja.md          # Japanese version
-├── Makefile               # Command collection
-├── compose.yaml           # Local environment definition
-├── docs/                  # Documentation
-│   ├── ja/                # Japanese version
+├── README.md              # このファイル（英語版）
+├── README.ja.md          # 日本語版
+├── Makefile               # コマンド集
+├── compose.yaml           # ローカル環境定義
+├── docs/                  # ドキュメント
+│   ├── ja/                # 日本語版
 │   │   ├── 01-setup.md
 │   │   ├── 02-node.md
 │   │   ├── 03-compact.md
 │   │   ├── 04-deploy.md
 │   │   ├── 05-dapp.md
 │   │   └── 06-toolkit.md
-│   └── en/                # English version
+│   └── en/                # 英語版
 │       ├── 01-setup.md
 │       ├── 02-node.md
 │       ├── 03-compact.md
 │       ├── 04-deploy.md
 │       ├── 05-dapp.md
 │       └── 06-toolkit.md
-├── scripts/               # Utility scripts
+├── scripts/               # ユーティリティスクリプト
 │   ├── wait-for-node.sh
 │   └── check-health.sh
-└── examples/              # Sample code
+└── examples/              # サンプルコード
     └── counter/
 ```
 
-## Related Resources
+## 関連リソース
 
 - [Midnight Documentation](https://docs.midnight.network/)
-- [example-counter](../example-counter/) - Sample dApp
-- [submodules/README.md](../submodules/README.md) - Repository overview
+- [example-counter](../example-counter/) - サンプル dApp
+- [submodules/README.md](../submodules/README.md) - リポジトリ概要
+

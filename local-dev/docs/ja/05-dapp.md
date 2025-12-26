@@ -336,7 +336,7 @@ my-midnight-dapp/
 
 ## 参考
 
-- [examples/counter](../examples/counter/) - 完全なサンプル
+- [examples/counter](../../examples/counter/) - 完全なサンプル
 - [04-deploy.md](04-deploy.md) - デプロイ方法の詳細
 
 ## 次のステップ
