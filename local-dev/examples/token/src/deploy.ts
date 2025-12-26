@@ -60,7 +60,7 @@ async function main() {
   // Load compiled contract
   console.log("Loading contract...");
   const contractPath = path.join(process.cwd(), "contract");
-  const contractModulePath = path.join(contractPath, "contract", "index.cjs");
+  const contractModulePath = path.join(contractPath, "token", "contract", "index.cjs");
 
   if (!fs.existsSync(contractModulePath)) {
     console.error("Contract not found! Make sure token contract is compiled.");
@@ -123,7 +123,7 @@ async function main() {
 
   // Configure providers
   console.log("\nSetting up providers...");
-  const zkConfigPath = path.join(contractPath);
+  const zkConfigPath = path.join(contractPath, "token");
   const providers = {
     privateStateProvider: levelPrivateStateProvider({
       privateStateStoreName: "token-state"

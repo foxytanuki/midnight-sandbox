@@ -1,8 +1,8 @@
 {
   "version": 3,
   "file": "index.cjs",
-  "sourceRoot": "../../",
-  "sources": ["counter.compact"],
+  "sourceRoot": "../../../",
+  "sources": ["contract/counter.compact"],
   "names": [],
   "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EASA;;;;;;;;;;MAKA,AAAA,SAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,SAGC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,SAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,GAEC;;;;;cAFkB,OAAe;;;;;;;;;;;;;;;;;;yCAAf,OAAe;;;;;;;gEAAf,OAAe;;;OAEjC;;;;;;;;GArBA;EAFD;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAHA;;;;;;;;;uDAA8B;UAI5B,KAAK;IAAL;;;;;;;yGAAA,KAAK;;uDAAA;;;;;;;GACN;EAGD,AAAA,YAEC;UADC,KAAK;;;;;6CAAI;;;;;;;;;;;gGAAK;;;IAAd;;;;;;;yGAAA,KAAK;;uDAAA;;GACN;EAGD,AAAA,YAGC;oDAFQ;;;;;;;;;;;uGAAK;;;;QACH,GAAS;UAAlB,KAAK,kCAAI;;;;;;;;;;;oGAAK;8CAAL,GAAS;;oBAAT,GAAS;IAAlB;;;;;;;yGAAA,KAAK;;uDAAA;;GACN;EAGD,AAAA,YAEC;mCADQ;;;;;;;;;;;sFAAK;GACb;EAGD,AAAA,MAEC,4BAFkB,OAAe;UAChC,KAAK;;;;;6CAAI;;;;;;;;;;;gGAAK;;qBAAY,OAAK;IAA/B;;;;;;;yGAAA,KAAK;;uDAAA;;GACN;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IA1BD;qCAAA;;;;;;;;;;;wFAA8B;KAAA;;;;;;;;;;;;;;"
 }

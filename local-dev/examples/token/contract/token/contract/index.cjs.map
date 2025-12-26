@@ -1,8 +1,8 @@
 {
   "version": 3,
   "file": "index.cjs",
-  "sourceRoot": "../../",
-  "sources": ["token.compact"],
+  "sourceRoot": "../../../",
+  "sources": ["contract/token.compact"],
   "names": [],
   "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;EAUA;;;;;;;;;;MAMA,AAAA,IAIC;;;;;cAJmB,QAAgB;;;;;;;;;;;;;;;;;;yCAAhB,QAAgB;;;;;;;iEAAhB,QAAgB;;;OAInC;MAGD,AAAA,IAKC;;;;;cALmB,QAAgB;;;;;;;;;;;;;;;;;;yCAAhB,QAAgB;;;;;;;iEAAhB,QAAgB;;;OAKnC;MAGD,AAAA,WAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;MAGD,AAAA,gBAEC;;;;;;;;;;;;;;;;;;;;;;OAAA;;;;;;;;GAzBA;EAHD;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAJA;;;;;;;;;uDAAoC;IACpC;;;;;;;;;uDAAqC;UAInC,KAAW;IAAX;;;;;;;yGAAA,KAAW;;uDAAA;UACX,KAAY;IAAZ;;;;;;;yGAAA,KAAY;;uDAAA;;;;;;;GACb;EAGD,AAAA,OAIC,4BAJmB,QAAgB;UAC5B,GAAoB,GAAP,QAAM;UACzB,KAAW;;;;;6CAAI;;;;;;;;;;;gGAAW;;qBAAG,GAAC;IAA9B;;;;;;;yGAAA,KAAW;;uDAAA;UACX,KAAY;;;;;6CAAI;;;;;;;;;;;gGAAY;;qBAAG,GAAC;IAAhC;;;;;;;yGAAA,KAAY;;uDAAA;;GACb;EAGD,AAAA,OAKC,4BALmB,QAAgB;UAC5B,GAAoB,GAAP,QAAM;oDAClB;;;;;;;;;;;uGAAY;;4BAAI,GAAC;;QACT,GAAe;UAA9B,KAAW,kCAAI;;;;;;;;;;;oGAAW;8CAAX,GAAe,GAAD,GAAC;;oBAAf,GAAe,GAAD,GAAC;IAA9B;;;;;;;yGAAA,KAAW;;uDAAA;QACK,GAAgB;UAAhC,KAAY,kCAAI;;;;;;;;;;;oGAAY;8CAAZ,GAAgB,GAAD,GAAC;;oBAAhB,GAAgB,GAAD,GAAC;IAAhC;;;;;;;yGAAA,KAAY;;uDAAA;;GACb;EAGD,AAAA,cAEC;mCADQ;;;;;;;;;;;sFAAY;GACpB;EAGD,AAAA,mBAEC;mCADQ;;;;;;;;;;;sFAAW;GACnB;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;IAhCD;qCAAA;;;;;;;;;;;wFAAoC;KAAA;IACpC;qCAAA;;;;;;;;;;;wFAAqC;KAAA;;;;;;;;;;;;;;"
 }
