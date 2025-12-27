@@ -1,0 +1,6 @@
+node_modules/
+dist/
+deployment.json
+bid-secrets.json
+midnight-level-db/
+
