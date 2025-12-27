@@ -1,11 +1,12 @@
 /**
- * Auction サーキット実行スクリプト
+ * Auction サーキット実行スクリプト（真の封印オークション版）
  */
 
 import * as fs from "fs";
 import * as path from "path";
 import * as Rx from "rxjs";
 import WebSocket from "ws";
+import * as crypto from "crypto";
 
 import { findDeployedContract } from "@midnight-ntwrk/midnight-js-contracts";
 import { createBalancedTx } from "@midnight-ntwrk/midnight-js-types";
@@ -22,6 +23,7 @@ import {
 import { WalletBuilder } from "@midnight-ntwrk/wallet";
 import { nativeToken, Transaction } from "@midnight-ntwrk/ledger";
 import { Transaction as ZswapTransaction } from "@midnight-ntwrk/zswap";
+import { persistentCommit, CompactTypeUnsignedInteger } from "@midnight-ntwrk/compact-runtime";
 
 // @ts-ignore
 globalThis.WebSocket = WebSocket;
@@ -35,6 +37,8 @@ const LOCAL_CONFIG = {
 
 const GENESIS_SEED = "0000000000000000000000000000000000000000000000000000000000000001";
 
+const BID_SECRETS_FILE = path.join(process.cwd(), "bid-secrets.json");
+
 const waitForSync = (wallet: any) =>
   Rx.firstValueFrom(
     wallet.state().pipe(
@@ -43,6 +47,49 @@ const waitForSync = (wallet: any) =>
     )
   );
 
+// ランダムな32バイトの秘密値を生成
+function generateSecret(): Uint8Array {
+  return new Uint8Array(crypto.randomBytes(32));
+}
+
+// コミットメントを生成
+function createCommitment(amount: bigint, secret: Uint8Array): Uint8Array {
+  const uint64Type = new CompactTypeUnsignedInteger(18446744073709551615n, 8);
+  return persistentCommit(uint64Type, amount, secret);
+}
+
+// 入札秘密値を保存
+function saveBidSecret(commitment: Uint8Array, amount: bigint, secret: Uint8Array) {
+  let secrets: Record<string, { amount: string; secret: number[] }> = {};
+  if (fs.existsSync(BID_SECRETS_FILE)) {
+    secrets = JSON.parse(fs.readFileSync(BID_SECRETS_FILE, "utf-8"));
+  }
+  const commitmentHex = Buffer.from(commitment).toString("hex");
+  secrets[commitmentHex] = {
+    amount: amount.toString(),
+    secret: Array.from(secret),
+  };
+  fs.writeFileSync(BID_SECRETS_FILE, JSON.stringify(secrets, null, 2));
+  console.log(`💾 Saved bid secret for commitment: ${commitmentHex.slice(0, 16)}...`);
+}
+
+// 入札秘密値を読み込み
+function loadBidSecret(commitment: Uint8Array): { amount: bigint; secret: Uint8Array } | null {
+  if (!fs.existsSync(BID_SECRETS_FILE)) {
+    return null;
+  }
+  const secrets = JSON.parse(fs.readFileSync(BID_SECRETS_FILE, "utf-8"));
+  const commitmentHex = Buffer.from(commitment).toString("hex");
+  const secretData = secrets[commitmentHex];
+  if (!secretData) {
+    return null;
+  }
+  return {
+    amount: BigInt(secretData.amount),
+    secret: new Uint8Array(secretData.secret),
+  };
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const circuit = args[0];
@@ -50,7 +97,13 @@ async function main() {
 
   if (!circuit) {
     console.log("Usage: node dist/run-circuit.js <circuit> [args]");
-    console.log("Available: bid <amount>, close_bidding, reveal, get_highest_bid, get_bid_count, is_revealed");
+    console.log("Available:");
+    console.log("  bid <amount>              - Place a bid (commitment)");
+    console.log("  close_bidding             - Close bidding");
+    console.log("  reveal <commitment_hex>    - Reveal a bid");
+    console.log("  get_highest_bid           - Get highest bid");
+    console.log("  get_bid_count             - Get bid count");
+    console.log("  is_revealed               - Check if revealed");
     process.exit(1);
   }
 
@@ -68,7 +121,7 @@ async function main() {
   setNetworkId(NetworkId.Undeployed);
 
   const contractPath = path.join(process.cwd(), "contract");
-  const contractModulePath = path.join(contractPath, "contract", "index.cjs");
+  const contractModulePath = path.join(contractPath, "auction", "contract", "index.cjs");
   const AuctionModule = await import(contractModulePath);
   const contractInstance = new AuctionModule.Contract({});
 
@@ -99,7 +152,7 @@ async function main() {
   const providers = {
     privateStateProvider: levelPrivateStateProvider({ privateStateStoreName: "auction-state" }),
     publicDataProvider: indexerPublicDataProvider(LOCAL_CONFIG.indexer, LOCAL_CONFIG.indexerWS),
-    zkConfigProvider: new NodeZkConfigProvider(contractPath),
+    zkConfigProvider: new NodeZkConfigProvider(path.join(contractPath, "auction")),
     proofProvider: httpClientProofProvider(LOCAL_CONFIG.proofServer),
     walletProvider, midnightProvider: walletProvider,
   };
@@ -114,42 +167,93 @@ async function main() {
 
   console.log("Connected!\n");
 
-  const getLedgerState = () => {
+  const getLedgerState = async () => {
     try {
-      const s = AuctionModule.ledger(deployed.deployTxData.public.initialContractState.data);
+      const currentState = await providers.publicDataProvider.queryContractState(deployment.contractAddress);
+      if (!currentState) {
+        return { highestBid: "N/A", bidCount: "N/A", isOpen: "N/A", isRevealed: "N/A" };
+      }
+      const s = AuctionModule.ledger(currentState.data);
       return { highestBid: s.highestBid, bidCount: s.bidCount, isOpen: s.isOpen, isRevealed: s.isRevealed };
-    } catch { return { highestBid: "N/A", bidCount: "N/A", isOpen: "N/A", isRevealed: "N/A" }; }
+    } catch (e) {
+      console.error("Error getting ledger state:", e);
+      return { highestBid: "N/A", bidCount: "N/A", isOpen: "N/A", isRevealed: "N/A" };
+    }
   };
 
-  const state = getLedgerState();
+  const state = await getLedgerState();
   console.log(`Highest: ${state.highestBid}, Bids: ${state.bidCount}, Open: ${state.isOpen}, Revealed: ${state.isRevealed}\n`);
 
   let result: any;
   switch (circuit.toLowerCase()) {
-    case "bid":
+    case "bid": {
       const amount = circuitArg ? BigInt(circuitArg) : 100n;
-      result = await deployed.callTx.bid(amount);
-      console.log(`✅ Bid ${amount}!`);
+      const secret = generateSecret();
+      const commitment = createCommitment(amount, secret);
+      
+      console.log(`🔒 Creating commitment for bid amount: ${amount}`);
+      console.log(`   Commitment: ${Buffer.from(commitment).toString("hex").slice(0, 16)}...`);
+      
+      result = await deployed.callTx.bid(commitment);
+      saveBidSecret(commitment, amount, secret);
+      console.log(`✅ Bid committed! Amount: ${amount} (secret saved)`);
       break;
+    }
     case "close_bidding":
       result = await deployed.callTx.close_bidding();
       console.log("✅ Bidding closed!");
       break;
-    case "reveal":
-      result = await deployed.callTx.reveal();
-      console.log("✅ Revealed!");
+    case "reveal": {
+      if (!circuitArg) {
+        console.error("Error: reveal requires commitment hex as argument");
+        console.error("Usage: reveal <commitment_hex>");
+        process.exit(1);
+      }
+      
+      const commitment = new Uint8Array(Buffer.from(circuitArg, "hex"));
+      const secretData = loadBidSecret(commitment);
+      
+      if (!secretData) {
+        console.error(`Error: No secret found for commitment: ${circuitArg.slice(0, 16)}...`);
+        console.error("Make sure you placed the bid using this script and the secret was saved.");
+        process.exit(1);
+      }
+      
+      console.log(`🔓 Revealing bid: amount=${secretData.amount}, commitment=${circuitArg.slice(0, 16)}...`);
+      result = await deployed.callTx.reveal(secretData.amount, secretData.secret);
+      console.log(`✅ Bid revealed! Amount: ${secretData.amount}`);
       break;
+    }
     case "get_highest_bid":
       result = await deployed.callTx.get_highest_bid();
-      console.log(`✅ Highest bid: ${result.callResult?.private?.result ?? "N/A"}`);
+      const highestBidResult = result.callResult?.private?.result;
+      if (highestBidResult !== undefined) {
+        console.log(`✅ Highest bid: ${highestBidResult}`);
+      } else {
+        // 状態を直接確認
+        const currentState = await getLedgerState();
+        console.log(`✅ Highest bid: ${currentState.highestBid}`);
+      }
       break;
     case "get_bid_count":
       result = await deployed.callTx.get_bid_count();
-      console.log(`✅ Bid count: ${result.callResult?.private?.result ?? "N/A"}`);
+      const bidCountResult = result.callResult?.private?.result;
+      if (bidCountResult !== undefined) {
+        console.log(`✅ Bid count: ${bidCountResult}`);
+      } else {
+        const currentState = await getLedgerState();
+        console.log(`✅ Bid count: ${currentState.bidCount}`);
+      }
       break;
     case "is_revealed":
       result = await deployed.callTx.is_revealed();
-      console.log(`✅ Revealed: ${result.callResult?.private?.result ?? "N/A"}`);
+      const isRevealedResult = result.callResult?.private?.result;
+      if (isRevealedResult !== undefined) {
+        console.log(`✅ Revealed: ${isRevealedResult}`);
+      } else {
+        const currentState = await getLedgerState();
+        console.log(`✅ Revealed: ${currentState.isRevealed}`);
+      }
       break;
     default:
       console.error(`Unknown circuit: ${circuit}`);

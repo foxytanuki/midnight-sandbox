@@ -7,5 +7,5 @@ midnight-level-db/
 # Compact contract build artifacts
 contract/**/keys/*.prover
 contract/**/keys/*.verifier
-contract/**/zkir/
+contract/**/zkir/*.bzkir
 

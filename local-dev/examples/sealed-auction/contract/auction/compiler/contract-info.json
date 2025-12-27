@@ -5,10 +5,10 @@
       "pure": false,
       "arguments": [
         {
-          "name": "amount",
+          "name": "commitment",
           "type": {
-            "type-name": "Uint",
-            "maxval": 18446744073709551615
+            "type-name": "Bytes",
+            "length": 32
           }
         }
       ],
@@ -33,6 +33,20 @@
       "name": "reveal",
       "pure": false,
       "arguments": [
+        {
+          "name": "amount",
+          "type": {
+            "type-name": "Uint",
+            "maxval": 18446744073709551615
+          }
+        },
+        {
+          "name": "secret",
+          "type": {
+            "type-name": "Bytes",
+            "length": 32
+          }
+        }
       ],
       "result-type": {
         "type-name": "Tuple",

@@ -1,13 +1,15 @@
 // auction.compact
-// シンプルな入札オークションコントラクト
+// 真の封印オークションコントラクト（コミットメントスキームを使用）
 
 pragma language_version >= 0.18.0;
+import CompactStandardLibrary;
 
 // オンチェーン状態
-export ledger highestBid: Uint<64>;
-export ledger bidCount: Uint<64>;
-export ledger isOpen: Boolean;
-export ledger isRevealed: Boolean;
+export ledger bidCommitments: Set<Bytes<32>>;  // 入札コミットメントのセット
+export ledger highestBid: Uint<64>;            // 最高入札額（公開後）
+export ledger bidCount: Uint<64>;              // 入札数
+export ledger isOpen: Boolean;                  // 入札受付中
+export ledger isRevealed: Boolean;              // 公開済み
 
 // コントラクト初期化
 constructor() {
@@ -17,13 +19,14 @@ constructor() {
   isRevealed = false;
 }
 
-// 入札を行う（最高額を更新）
-export circuit bid(amount: Uint<64>): [] {
+// 入札（コミットメントを送信）
+export circuit bid(commitment: Bytes<32>): [] {
   assert(isOpen, "auction is closed");
+  assert(!bidCommitments.member(disclose(commitment)), "duplicate commitment");
+  
+  // コミットメントを保存（公開されるが、中身は秘密）
+  bidCommitments.insert(disclose(commitment));
   bidCount = (bidCount + 1) as Uint<64>;
-  // 入札額が現在の最高額より高いことをアサート
-  assert(disclose(amount) > highestBid, "bid too low");
-  highestBid = disclose(amount);
 }
 
 // 入札を締め切る
@@ -31,9 +34,19 @@ export circuit close_bidding(): [] {
   isOpen = false;
 }
 
-// 結果を公開
-export circuit reveal(): [] {
+// 入札を公開
+export circuit reveal(amount: Uint<64>, secret: Bytes<32>): [] {
   assert(!isOpen, "bidding is still open");
+  
+  // コミットメントを再計算して検証
+  const commitment = persistentCommit<Uint<64>>(amount, secret);
+  assert(bidCommitments.member(disclose(commitment)), "invalid commitment");
+  
+  // 最高額を更新（disclose()で公開）
+  if (disclose(amount) > highestBid) {
+    highestBid = disclose(amount);
+  }
+  
   isRevealed = true;
 }
 

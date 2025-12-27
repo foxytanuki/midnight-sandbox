@@ -4,9 +4,11 @@ export type Witnesses<T> = {
 }
 
 export type ImpureCircuits<T> = {
-  bid(context: __compactRuntime.CircuitContext<T>, amount_0: bigint): __compactRuntime.CircuitResults<T, []>;
+  bid(context: __compactRuntime.CircuitContext<T>, commitment_0: Uint8Array): __compactRuntime.CircuitResults<T, []>;
   close_bidding(context: __compactRuntime.CircuitContext<T>): __compactRuntime.CircuitResults<T, []>;
-  reveal(context: __compactRuntime.CircuitContext<T>): __compactRuntime.CircuitResults<T, []>;
+  reveal(context: __compactRuntime.CircuitContext<T>,
+         amount_0: bigint,
+         secret_0: Uint8Array): __compactRuntime.CircuitResults<T, []>;
   get_highest_bid(context: __compactRuntime.CircuitContext<T>): __compactRuntime.CircuitResults<T, bigint>;
   get_bid_count(context: __compactRuntime.CircuitContext<T>): __compactRuntime.CircuitResults<T, bigint>;
   is_revealed(context: __compactRuntime.CircuitContext<T>): __compactRuntime.CircuitResults<T, boolean>;
@@ -16,15 +18,23 @@ export type PureCircuits = {
 }
 
 export type Circuits<T> = {
-  bid(context: __compactRuntime.CircuitContext<T>, amount_0: bigint): __compactRuntime.CircuitResults<T, []>;
+  bid(context: __compactRuntime.CircuitContext<T>, commitment_0: Uint8Array): __compactRuntime.CircuitResults<T, []>;
   close_bidding(context: __compactRuntime.CircuitContext<T>): __compactRuntime.CircuitResults<T, []>;
-  reveal(context: __compactRuntime.CircuitContext<T>): __compactRuntime.CircuitResults<T, []>;
+  reveal(context: __compactRuntime.CircuitContext<T>,
+         amount_0: bigint,
+         secret_0: Uint8Array): __compactRuntime.CircuitResults<T, []>;
   get_highest_bid(context: __compactRuntime.CircuitContext<T>): __compactRuntime.CircuitResults<T, bigint>;
   get_bid_count(context: __compactRuntime.CircuitContext<T>): __compactRuntime.CircuitResults<T, bigint>;
   is_revealed(context: __compactRuntime.CircuitContext<T>): __compactRuntime.CircuitResults<T, boolean>;
 }
 
 export type Ledger = {
+  bidCommitments: {
+    isEmpty(): boolean;
+    size(): bigint;
+    member(elem_0: Uint8Array): boolean;
+    [Symbol.iterator](): Iterator<Uint8Array>
+  };
   readonly highestBid: bigint;
   readonly bidCount: bigint;
   readonly isOpen: boolean;
