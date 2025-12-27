@@ -6,7 +6,7 @@
     { "op": "load_imm", "imm": "01" },
     { "op": "load_imm", "imm": "00" },
     { "op": "load_imm", "imm": "10" },
-    { "op": "load_imm", "imm": "02" },
+    { "op": "load_imm", "imm": "03" },
     { "op": "declare_pub_input", "var": 2 },
     { "op": "declare_pub_input", "var": 0 },
     { "op": "declare_pub_input", "var": 0 },
