@@ -288,6 +288,34 @@ This function creates a cryptographic commitment:
 - **Secret Uniqueness**: Each bid must use a unique `secret`. Reusing secrets can compromise privacy.
 - **Commitment Storage**: Commitments are stored in a `Set`, preventing duplicate commitments.
 
+## Important Points: Secret Management and Reveal
+
+### Where is `amount` stored?
+
+- **During bidding**: `amount` is stored **off-chain** (client-side) in `bid-secrets.json`
+- **On-chain**: Only the `commitment` (hash) is stored, not the `amount` or `secret`
+- **During reveal**: `amount` and `secret` are loaded from `bid-secrets.json` and used to generate the ZK proof
+
+### Who can reveal?
+
+- **Technically**: Anyone who knows both `amount` and `secret` can reveal
+- **Practically**: Usually the bidder who has `bid-secrets.json`
+- **Note**: The contract does not verify who placed the bid, only that `persistentCommit(amount, secret)` matches a stored commitment
+
+### What happens if `amount` is changed?
+
+- **Cannot reveal**: If you change `amount` but keep the same `secret`, a different commitment is generated
+- **Verification fails**: The new commitment won't match the stored one, so `reveal` will fail with "invalid commitment"
+- **Both required**: Both `amount` and `secret` must match exactly what was used during bidding
+
+### Secret storage requirements
+
+- **Must store**: The `secret` must be stored separately (it's not on-chain)
+- **Current implementation**: Uses `bid-secrets.json` (local file)
+- **Alternative methods**: Database, encrypted storage, wallet integration, etc. are all possible
+- **If lost**: If `secret` is lost, the bid cannot be revealed and becomes invalid
+- **Security**: If `secret` is leaked, anyone who knows both `amount` and `secret` can reveal the bid
+
 ## Example Workflow
 
 ```bash
