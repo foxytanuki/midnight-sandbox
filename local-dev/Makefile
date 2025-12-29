@@ -1,4 +1,4 @@
-.PHONY: up down restart logs status health clean node-logs indexer-logs proof-logs shell
+.PHONY: up down restart logs status health clean node-logs indexer-logs proof-logs faucet-logs shell
 
 # デフォルトターゲット
 .DEFAULT_GOAL := help
@@ -16,6 +16,7 @@ up: ## ローカル環境を起動
 	@echo "  Node RPC:     ws://localhost:9944"
 	@echo "  Indexer:      http://localhost:8088/graphql"
 	@echo "  Proof Server: http://localhost:6300"
+	@echo "  Faucet API:   http://localhost:3000"
 	@echo ""
 	@echo "Run 'make status' to check service health"
 
@@ -47,6 +48,9 @@ indexer-logs: ## Indexer のログを表示
 proof-logs: ## Proof Server のログを表示
 	@exec docker compose -f $(COMPOSE_FILE) logs -f proof-server
 
+faucet-logs: ## Faucet API のログを表示
+	@exec docker compose -f $(COMPOSE_FILE) logs -f faucet-api
+
 ##@ 開発ツール
 
 shell: ## Node コンテナにシェル接続
@@ -54,6 +58,18 @@ shell: ## Node コンテナにシェル接続
 
 wait: ## Node が起動するまで待機
 	@exec ./scripts/wait-for-node.sh
+
+fund: ## アドレスに資金を供給 (ADDRESS=mnemonic|shielded-address|unshielded-address を指定)
+	@if [ -z "$(ADDRESS)" ]; then \
+		echo "Usage: make fund ADDRESS=\"<mnemonic or address>\""; \
+		echo ""; \
+		echo "Examples:"; \
+		echo "  make fund ADDRESS=\"your twelve word mnemonic phrase here\""; \
+		echo "  make fund ADDRESS=mn_shield-addr_undeployed1q..."; \
+		echo "  make fund ADDRESS=mn_addr_undeployed1q..."; \
+		exit 1; \
+	fi
+	@./scripts/fund.sh "$(ADDRESS)"
 
 ##@ Compact
 

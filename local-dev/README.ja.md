@@ -33,10 +33,10 @@ make down
 └─────────────────────────────────────────────────────────────┘
          │                    │                    │
          ▼                    ▼                    ▼
-┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
-│  Proof Server   │  │    Indexer      │  │     Node        │
-│  localhost:6300 │  │ localhost:8088  │  │ localhost:9944  │
-└─────────────────┘  └─────────────────┘  └─────────────────┘
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│  Proof Server   │  │    Indexer      │  │     Node        │  │   Faucet API   │
+│  localhost:6300 │  │ localhost:8088  │  │ localhost:9944  │  │ localhost:3000  │
+└─────────────────┘  └─────────────────┘  └─────────────────┘  └─────────────────┘
          │                    │                    │
          └────────────────────┴────────────────────┘
                               │
@@ -75,6 +75,34 @@ compact -V
 | Node RPC | `ws://localhost:9944` | トランザクション送信 |
 | Indexer GraphQL | `http://localhost:8088/graphql` | 状態クエリ |
 | Proof Server | `http://localhost:6300` | ZK証明生成 |
+| Faucet API | `http://localhost:3000` | Shielded/Unshieldedアドレスへの資金供給 |
+
+## Faucet API
+
+Faucet APIを使用してローカルネットワーク上のshielded/unshieldedアドレスに資金を供給できます。
+
+### スクリプトの使用
+
+```bash
+# ニーモニックを使用して送金（shieldedとunshieldedの両方のアドレスを導出）
+make fund ADDRESS="your twelve word mnemonic phrase here"
+
+# Shieldedアドレスに送金
+make fund ADDRESS=mn_shield-addr_undeployed1q...
+
+# Unshieldedアドレスに送金
+make fund ADDRESS=mn_addr_undeployed1q...
+```
+
+または、スクリプトを直接使用：
+
+```bash
+./scripts/fund.sh "your mnemonic here"
+./scripts/fund.sh mn_shield-addr_undeployed1q...
+./scripts/fund.sh mn_addr_undeployed1q...
+```
+
+詳細は [faucet-api/README.md](faucet-api/README.md) を参照してください。
 
 ## ディレクトリ構成
 
@@ -84,6 +112,10 @@ local-dev/
 ├── README.ja.md          # 日本語版
 ├── Makefile               # コマンド集
 ├── compose.yaml           # ローカル環境定義
+├── faucet-api/            # Faucet APIサービス
+│   ├── src/               # ソースコード
+│   ├── Dockerfile
+│   └── README.md
 ├── docs/                  # ドキュメント
 │   ├── ja/                # 日本語版
 │   │   ├── 01-setup.md
@@ -101,7 +133,8 @@ local-dev/
 │       └── 06-toolkit.md
 ├── scripts/               # ユーティリティスクリプト
 │   ├── wait-for-node.sh
-│   └── check-health.sh
+│   ├── check-health.sh
+│   └── fund.sh            # Faucet APIスクリプト
 └── examples/              # サンプルコード
     └── counter/
 ```

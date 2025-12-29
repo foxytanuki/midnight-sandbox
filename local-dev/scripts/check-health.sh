@@ -40,6 +40,9 @@ fi
 
 check_service "Proof Server" "$PROOF_SERVER_URL" "/health" || errors=$((errors + 1))
 
+FAUCET_API_URL="${FAUCET_API_URL:-http://localhost:3000}"
+check_service "Faucet API" "$FAUCET_API_URL" "/health" || errors=$((errors + 1))
+
 echo ""
 if [ $errors -eq 0 ]; then
     echo "🎉 All services are healthy!"

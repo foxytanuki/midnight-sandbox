@@ -33,10 +33,10 @@ make down
 └─────────────────────────────────────────────────────────────┘
          │                    │                    │
          ▼                    ▼                    ▼
-┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
-│  Proof Server   │  │    Indexer      │  │     Node        │
-│  localhost:6300 │  │ localhost:8088  │  │ localhost:9944  │
-└─────────────────┘  └─────────────────┘  └─────────────────┘
+┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐
+│  Proof Server   │  │    Indexer      │  │     Node        │  │   Faucet API   │
+│  localhost:6300 │  │ localhost:8088  │  │ localhost:9944  │  │ localhost:3000  │
+└─────────────────┘  └─────────────────┘  └─────────────────┘  └─────────────────┘
          │                    │                    │
          └────────────────────┴────────────────────┘
                               │
@@ -75,6 +75,34 @@ compact -V
 | Node RPC | `ws://localhost:9944` | Transaction submission |
 | Indexer GraphQL | `http://localhost:8088/graphql` | State queries |
 | Proof Server | `http://localhost:6300` | ZK proof generation |
+| Faucet API | `http://localhost:3000` | Fund shielded/unshielded addresses |
+
+## Faucet API
+
+The Faucet API allows you to fund shielded and unshielded addresses on the local network.
+
+### Using the Script
+
+```bash
+# Fund using mnemonic (derives both shielded and unshielded addresses)
+make fund ADDRESS="your twelve word mnemonic phrase here"
+
+# Fund a shielded address
+make fund ADDRESS=mn_shield-addr_undeployed1q...
+
+# Fund an unshielded address
+make fund ADDRESS=mn_addr_undeployed1q...
+```
+
+Or use the script directly:
+
+```bash
+./scripts/fund.sh "your mnemonic here"
+./scripts/fund.sh mn_shield-addr_undeployed1q...
+./scripts/fund.sh mn_addr_undeployed1q...
+```
+
+For more details, see [faucet-api/README.md](faucet-api/README.md).
 
 ## Directory Structure
 
@@ -84,6 +112,10 @@ local-dev/
 ├── README.ja.md          # Japanese version
 ├── Makefile               # Command collection
 ├── compose.yaml           # Local environment definition
+├── faucet-api/            # Faucet API service
+│   ├── src/               # Source code
+│   ├── Dockerfile
+│   └── README.md
 ├── docs/                  # Documentation
 │   ├── ja/                # Japanese version
 │   │   ├── 01-setup.md
@@ -101,7 +133,8 @@ local-dev/
 │       └── 06-toolkit.md
 ├── scripts/               # Utility scripts
 │   ├── wait-for-node.sh
-│   └── check-health.sh
+│   ├── check-health.sh
+│   └── fund.sh            # Faucet API script
 └── examples/              # Sample code
     └── counter/
 ```

@@ -40,3 +40,31 @@ services:
       start_period: 5s
     environment:
       CFG_PRESET: "dev"
+
+  faucet-api:
+    build:
+      context: ./faucet-api
+      dockerfile: Dockerfile
+    container_name: "faucet-api"
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_URL: "ws://node:9944"
+      INDEXER_HTTP_URL: "http://indexer:8088/api/v3/graphql"
+      INDEXER_WS_URL: "ws://indexer:8088/api/v3/graphql/ws"
+      PROOF_SERVER_URL: "http://proof-server:6300"
+      PORT: "3000"
+      HOSTNAME: "0.0.0.0"
+    depends_on:
+      node:
+        condition: service_healthy
+      indexer:
+        condition: service_healthy
+      proof-server:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "bun", "-e", "const res = await fetch('http://localhost:3000/health'); if (!res.ok) process.exit(1);"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
