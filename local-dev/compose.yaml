@@ -1,61 +1,42 @@
-# Midnight Local Development Stack
-# ローカル dApp 開発用の完全な環境
-
 services:
-  # Midnight Node - ブロックチェーンノード
-  node:
-    image: midnightnetwork/midnight-node:0.12.0
-    container_name: midnight-node
-    ports:
-      - "9944:9944"   # WebSocket RPC
-      - "30333:30333" # P2P (optional)
-    environment:
-      CFG_PRESET: dev
-      RUST_LOG: info
-      BASE_PATH: /data
-    volumes:
-      - node-data:/data
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9944/health"]
-      interval: 5s
-      timeout: 10s
-      retries: 10
-      start_period: 30s
-    restart: unless-stopped
-
-  # Indexer - GraphQL API for querying chain state
-  indexer:
-    image: midnightntwrk/indexer-standalone:2.1.4-b49e3d9a
-    container_name: midnight-indexer
-    ports:
-      - "8088:8088"
-    environment:
-      RUST_LOG: info
-      APP__INFRA__NODE__URL: ws://node:9944
-      APP__INFRA__SECRET: "303132333435363738393031323334353637383930313233343536373839303132"
-    volumes:
-      - indexer-data:/data
-    depends_on:
-      node:
-        condition: service_healthy
-    restart: unless-stopped
-
-  # Proof Server - ZK proof generation
   proof-server:
-    image: midnightnetwork/proof-server:4.0.0
-    container_name: midnight-proof-server
+    image: "midnightnetwork/proof-server:6.1.0-alpha.6"
+    container_name: "proof-server"
     ports:
       - "6300:6300"
+
+  indexer:
+    image: "midnightntwrk/indexer-standalone:3.0.0-alpha.20"
+    container_name: "indexer"
+    ports:
+      - '8088:8088'
     environment:
-      RUST_BACKTRACE: full
-      RUST_LOG: info
-    restart: unless-stopped
+      RUST_LOG: "indexer=info,chain_indexer=info,indexer_api=info,wallet_indexer=info,indexer_common=info,fastrace_opentelemetry=info,info"
+      # Random 32-byte hex-encoded secret used to make the standalone indexer run.
+      # Only needed to satisfy the config schema – not meant for secure use.
+      APP__INFRA__SECRET: "303132333435363738393031323334353637383930313233343536373839303132"
+      APP__INFRA__NODE__URL: "ws://node:9944"
 
-networks:
-  default:
-    name: midnight-local
-
-volumes:
-  node-data:
-  indexer-data:
-
+    healthcheck:
+      test: ["CMD-SHELL", "cat /var/run/indexer-standalone/running"]
+      start_interval: "5s"
+      interval: "5s"
+      timeout: "2s"
+      retries: 2
+      start_period: 5s
+    depends_on:
+      node:
+        condition: service_started
+  node:
+    image: "midnightntwrk/midnight-node:0.18.0"
+    container_name: "node"
+    ports:
+      - "9944:9944"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9944/health"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    environment:
+      CFG_PRESET: "dev"
