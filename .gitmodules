@@ -40,3 +40,6 @@
 [submodule "submodules/polkadot-js-apps"]
 	path = submodules/polkadot-js-apps
 	url = https://github.com/polkadot-js/apps.git
+[submodule "submodules/midnight-local-network"]
+	path = submodules/midnight-local-network
+	url = https://github.com/bricktowers/midnight-local-network
