@@ -2,7 +2,7 @@
 # Start cloudflared tunnels for Midnight Node
 
 # Start each tunnel in background
-cloudflared tunnel --url ws://localhost:9944 > /tmp/cloudflared-node.log 2>&1 &
+cloudflared tunnel --url http://localhost:9944 > /tmp/cloudflared-node.log 2>&1 &
 NODE_PID=$!
 
 cloudflared tunnel --url http://localhost:8088 > /tmp/cloudflared-indexer.log 2>&1 &

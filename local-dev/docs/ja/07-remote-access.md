@@ -40,7 +40,7 @@ Midnight Node の各サービスを公開するには、複数の cloudflared �
 
 ```bash
 # ターミナル1: Node RPC (WebSocket/HTTP)
-cloudflared tunnel --url ws://localhost:9944
+cloudflared tunnel --url http://localhost:9944
 
 # ターミナル2: Indexer GraphQL
 cloudflared tunnel --url http://localhost:8088
@@ -80,7 +80,7 @@ MIDNIGHT_PROOF_SERVER_URL=https://zzzz-zzz-zzz-zzz.trycloudflare.com
 # Midnight Node 用の cloudflared トンネルを起動
 
 # 各トンネルをバックグラウンドで起動
-cloudflared tunnel --url ws://localhost:9944 > /tmp/cloudflared-node.log 2>&1 &
+cloudflared tunnel --url http://localhost:9944 > /tmp/cloudflared-node.log 2>&1 &
 NODE_PID=$!
 
 cloudflared tunnel --url http://localhost:8088 > /tmp/cloudflared-indexer.log 2>&1 &
@@ -120,8 +120,9 @@ chmod +x scripts/start-cloudflared-tunnels.sh
 
 ### WebSocket 接続エラー
 
-- Node RPC の URL は `wss://` (WebSocket Secure) を使用してください
-- cloudflared は自動的に WebSocket をサポートします
+- Cloudflare Tunnel は `ws://` プロトコルを直接サポートしていません
+- `http://localhost:9944` として設定してください（cloudflared が自動的に WebSocket をサポートします）
+- クライアント側では、生成された URL を `wss://` (WebSocket Secure) として使用してください
 
 ### CORS エラー
 
