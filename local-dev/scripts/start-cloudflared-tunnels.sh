@@ -38,7 +38,7 @@ echo ""
 echo "Node RPC (WebSocket/HTTP):"
 if [ -n "$NODE_URL" ]; then
     echo "  URL: $NODE_URL"
-    echo "  WSS: ${NODE_URL/http/wss}"
+    echo "  WSS: ${NODE_URL/https/wss}"
 else
     echo "  URL: (checking...)"
 fi
