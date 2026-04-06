@@ -43,3 +43,9 @@
 [submodule "submodules/midnight-local-network"]
 	path = submodules/midnight-local-network
 	url = https://github.com/bricktowers/midnight-local-network
+[submodule "submodules/create-mn-app"]
+	path = submodules/create-mn-app
+	url = https://github.com/midnightntwrk/create-mn-app.git
+[submodule "submodules/midnight-apps"]
+	path = submodules/midnight-apps
+	url = https://github.com/OpenZeppelin/midnight-apps.git
