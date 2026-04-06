@@ -40,7 +40,7 @@
 | [compact-zed](https://github.com/midnightntwrk/compact-zed) | Zed エディタ拡張 |
 | [midnight-trusted-setup](https://github.com/midnightntwrk/midnight-trusted-setup) | Trusted Setup |
 | [midnight-node-docker](https://github.com/midnightntwrk/midnight-node-docker) | Docker 環境 |
-| [midnight-dapp-connector-api](https://github.com/midnightntwrk/midnight-dapp-connector-api) | dApp コネクタ API |
+| [midnight-dapp-connector-api](https://github.com/midnightntwrk/midnight-dapp-connector-api) | dApp 連携 API |
 
 ## npm パッケージ
 
@@ -67,15 +67,12 @@ pnpm add @midnight-ntwrk/midnight-js-level-private-state-provider@latest
 
 # ZK アーティファクト
 pnpm add @midnight-ntwrk/midnight-js-fetch-zk-config-provider@latest
-pnpm add @midnight-ntwrk/midnight-js-node-zk-config-provider@latest
 ```
 
 ### ウォレット連携
 
 ```bash
-# ウォレット SDK
-pnpm add @midnight-ntwrk/wallet@latest
-pnpm add @midnight-ntwrk/dapp-connector-api@latest
+# ウォレット連携は各ウォレットの公開 API を使用
 ```
 
 ### ランタイム
@@ -100,7 +97,7 @@ Day 1-2: Midnight の概念理解
 
 Day 3-4: Compact 言語の習得
 ├── 本ガイドブック 03 を読む
-├── example-counter を動かす
+├── create-mn-app で生成した雛形を確認
 └── 簡単なコントラクトを書く
 
 Day 5-7: 開発環境構築
@@ -114,7 +111,7 @@ Day 5-7: 開発環境構築
 ```
 Day 1-3: SDK の習得
 ├── 本ガイドブック 04 を読む
-├── example-bboard を動かす
+├── create-mn-app の構成を確認
 └── コントラクト連携を実装
 
 Day 4-5: プライバシー機能
@@ -149,25 +146,7 @@ Day 6-7: デプロイ
 
 ## クイックスタート
 
-### 1. サンプルプロジェクトの実行
-
-```bash
-# example-counter をクローン
-git clone https://github.com/midnightntwrk/example-counter
-cd example-counter
-
-# 依存関係インストール
-pnpm install
-
-# ローカル環境起動
-docker-compose up -d
-
-# ビルドと実行
-pnpm build
-pnpm start
-```
-
-### 2. create-mn-app でプロジェクト作成
+### 1. create-mn-app でプロジェクト作成
 
 ```bash
 # プロジェクト生成
@@ -181,12 +160,12 @@ pnpm install
 pnpm dev
 ```
 
-### 3. 既存コントラクトへの接続
+### 2. 既存コントラクトへの接続
 
 ```typescript
-import { findContract } from '@midnight-ntwrk/midnight-js-contracts';
+import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
 
-const contract = await findContract({
+const contract = await findDeployedContract({
   runtime: myContractRuntime,
   witnesses: myWitnesses,
   publicDataProvider,
@@ -196,8 +175,7 @@ const contract = await findContract({
   contractAddress: '0x...',
 });
 
-// circuit を呼び出し
-const result = await contract.call('myCircuit', { arg1: 42n });
+// circuit は call / submitCallTx の流れで呼び出す
 ```
 
 ## トラブルシューティング
@@ -278,4 +256,3 @@ docker logs -f proof-server
 質問やフィードバックがあれば、GitHub Issues または Discord でお知らせください。
 
 Happy Building on Midnight! 🌙
-

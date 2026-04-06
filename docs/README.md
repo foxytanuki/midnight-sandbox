@@ -24,20 +24,12 @@ A technical guide for the Midnight blockchain, designed for developers with expe
 ## Quick Start
 
 ```bash
-# 1. Clone sample project
-git clone https://github.com/midnightntwrk/example-counter
-cd example-counter
-
-# 2. Install dependencies
-pnpm install
-
-# 3. Start local environment
-docker-compose up -d
-
-# 4. Build and run
-pnpm build
-pnpm start
+npx create-mn-app@latest my-dapp
+cd my-dapp
+npm run setup
 ```
+
+For sample apps like `example-counter`, follow that repository's own README rather than a generic build/start flow.
 
 ## Midnight Highlights
 
@@ -81,4 +73,3 @@ Feedback and improvement suggestions are welcome:
 ## License
 
 This documentation is based on Midnight's open source repositories.
-

@@ -119,23 +119,22 @@ pub struct CounterAccount {
 
 **Compact (Midnight):**
 ```compact
-pragma midnight 0.3.0;
+pragma language_version >= 0.20;
+import CompactStandardLibrary;
 
-ledger {
-    count: Unsigned Integer;
-}
+export ledger count: Counter;
 
 export circuit increment(): [] {
-    ledger.count = ledger.count + 1;
+    count.increment(1);
 }
 
 export circuit decrement(): [] {
-    assert ledger.count > 0;
-    ledger.count = ledger.count - 1;
+    assert(count >= 0);
+    count.decrement(1);
 }
 
-export circuit get_count(): Unsigned Integer {
-    return ledger.count;
+export circuit get_count(): Uint<128> {
+    return count as Uint<128>;
 }
 ```
 
@@ -156,25 +155,23 @@ contract Token {
 
 **Midnight: With Privacy**
 ```compact
-pragma midnight 0.3.0;
+pragma language_version >= 0.20;
+import CompactStandardLibrary;
 
-ledger {
-    // Only total supply is public
-    total_supply: Unsigned Integer;
-    // Balances managed privately
-}
+export ledger total_supply: Uint<128>;
+// Balances are managed privately through witnesses
 
-witness get_my_balance(): Unsigned Integer;
-witness update_balance(delta: Integer): [];
-witness get_recipient_key(): Bytes;
+witness get_my_balance(): Uint<128>;
+witness update_balance(delta: Uint<128>): [];
+witness get_recipient_key(): Bytes<32>;
 
-export circuit transfer(amount: Unsigned Integer): [] {
+export circuit transfer(amount: Uint<128>): [] {
     // Check balance privately
     let my_balance = get_my_balance();
     assert my_balance >= amount;
     
     // Update balance (private)
-    update_balance(-amount as Integer);
+    update_balance(amount);
     
     // Transfer to recipient (via Zswap, details hidden)
     // Declare Zswap output with Effects
@@ -202,10 +199,10 @@ contract Owned {
 **Compact:**
 ```compact
 ledger {
-    owner_hash: Bytes;  // Owner's public key hash
+    owner_hash: Bytes<32>;  // Owner's public key hash
 }
 
-witness get_caller_hash(): Bytes;
+witness get_caller_hash(): Bytes<32>;
 
 circuit check_owner(): [] {
     let caller = get_caller_hash();
@@ -293,7 +290,7 @@ export circuit admin_function(): [] {
 | `modifier` | Separate common logic into circuit |
 | `event Log(...)` | `log(...)` function |
 | `payable` | Zswap Effects |
-| `mapping(address => uint)` | `Map<Bytes, Unsigned Integer>` |
+| `mapping(address => uint)` | `Map<Bytes<32>, Uint<128>>` |
 | `ERC-20 transfer` | Zswap + witness |
 | `Ownable` | `ledger.owner` + witness verification |
 
@@ -316,11 +313,11 @@ export circuit admin_function(): [] {
 ```compact
 // Public state = readable by anyone
 ledger {
-    public_counter: Unsigned Integer;  // Public
+    public_counter: Uint<128>;  // Public
 }
 
 // Private = witness + local storage
-witness get_private_data(): Bytes;  // Only you
+witness get_private_data(): Bytes<32>;  // Only you
 ```
 
 ### 2. Cost of Proof Generation
@@ -397,4 +394,3 @@ Midnight: Proof size is fixed regardless of input size
 ---
 
 **Next Chapter**: [07-resources](./07-resources.md) - Resources and Next Steps
-

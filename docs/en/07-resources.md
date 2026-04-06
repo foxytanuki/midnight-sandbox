@@ -73,10 +73,11 @@ pnpm add @midnight-ntwrk/midnight-js-node-zk-config-provider@latest
 ### Wallet Integration
 
 ```bash
-# Wallet SDK
-pnpm add @midnight-ntwrk/wallet@latest
+# Browser wallet connector
 pnpm add @midnight-ntwrk/dapp-connector-api@latest
 ```
+
+For lower-level wallet SDK building blocks, choose the specific `@midnight-ntwrk/wallet-sdk-*` packages you need from the wallet monorepo.
 
 ### Runtime
 
@@ -149,44 +150,27 @@ Day 6-7: Deployment
 
 ## Quick Start
 
-### 1. Run Sample Project
+### 1. Create a new app with create-mn-app
 
 ```bash
-# Clone example-counter
-git clone https://github.com/midnightntwrk/example-counter
-cd example-counter
-
-# Install dependencies
-pnpm install
-
-# Start local environment
-docker-compose up -d
-
-# Build and run
-pnpm build
-pnpm start
-```
-
-### 2. Create Project with create-mn-app
-
-```bash
-# Generate project
 npx create-mn-app@latest my-dapp
-
-# Setup
 cd my-dapp
-pnpm install
-
-# Start development
-pnpm dev
+npm run setup
 ```
 
-### 3. Connect to Existing Contract
+This is the safest starting path for a fresh Midnight app. It sets up the proof server, compiles the Compact contract, and deploys to Preprod.
+
+### 2. Explore the sample projects
+
+If you want to study an example app, use the sample repository README for its current commands.
+For example, `example-counter` has its own Preprod/Standalone instructions and should not be followed with a generic `pnpm build && pnpm start` flow.
+
+### 3. Connect to an existing contract
 
 ```typescript
-import { findContract } from '@midnight-ntwrk/midnight-js-contracts';
+import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
 
-const contract = await findContract({
+const contract = await findDeployedContract({
   runtime: myContractRuntime,
   witnesses: myWitnesses,
   publicDataProvider,
@@ -196,8 +180,7 @@ const contract = await findContract({
   contractAddress: '0x...',
 });
 
-// Call circuit
-const result = await contract.call('myCircuit', { arg1: 42n });
+// Use the generated contract API to call circuits.
 ```
 
 ## Troubleshooting
@@ -278,4 +261,3 @@ docker logs -f proof-server
 If you have questions or feedback, please let us know via GitHub Issues or Discord.
 
 Happy Building on Midnight! 🌙
-

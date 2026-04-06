@@ -12,7 +12,7 @@ graph TB
 
     subgraph "SDK Layer"
         js[midnight-js<br/>dApp Framework]
-        wallet[midnight-wallet<br/>Wallet SDK]
+        wallet[Midnight wallet SDK]
     end
 
     subgraph "Infrastructure Layer"
@@ -89,7 +89,7 @@ block-beta
             block:pallets["Pallets"]
                 columns 3
                 midnight["Midnight System"]
-                native["Native Token Observation"]
+        native["cNIGHT Observation"]
                 federated["Federated Authority"]
             end
         end
@@ -106,7 +106,7 @@ block-beta
 **Main Pallets:**
 - `pallet-midnight`: Core transaction processing, ZK proof verification
 - `pallet-midnight-system`: System transaction management
-- `pallet-native-token-observation`: Cardano bridge (cNIGHT → DUST)
+- `pallet-cnight-observation`: Cardano bridge (cNIGHT → DUST)
 - `pallet-federated-authority`: Federated governance
 
 ---
@@ -141,7 +141,7 @@ graph LR
 
 ### midnight-zk
 
-**Role**: Zero-knowledge proof system and ZK circuit construction tools
+**Role**: Zero-knowledge proofs and ZK circuit construction tools
 
 | Item | Details |
 |------|---------|
@@ -153,7 +153,7 @@ graph LR
 | Component | Role |
 |-----------|------|
 | `curves` | BLS12-381 / JubJub elliptic curve implementation |
-| `proof-system` | Plonk proof system (KZG-based) |
+| `proofs` / `midnight-proofs` | Plonk proof tooling (KZG-based) |
 | `circuits` | ZK circuit construction toolkit |
 | `aggregator` | Proof aggregation (efficient verification of multiple proofs) |
 
@@ -223,10 +223,7 @@ graph TB
 **Main Packages:**
 | Package | Role |
 |---------|------|
-| `wallet` | Wallet runtime & builder |
-| `hd` | HD wallet API |
-| `address-format` | Bech32m address format |
-| `capabilities` | Coin selection & balance management |
+| wallet runtime packages | Wallet runtime, HD, address format, and balance management |
 
 ---
 
@@ -286,4 +283,3 @@ flowchart TB
 ---
 
 **Next Chapter**: [02-core-concepts](./02-core-concepts.md) - Zero-Knowledge Proofs and Core Concepts
-

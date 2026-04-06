@@ -87,7 +87,7 @@ graph TB
 
     subgraph core["Core Library Layer"]
         ledger["midnight-ledger<br/>State & Tx Logic"]
-        zk["midnight-zk<br/>Proof System"]
+        zk["midnight-zk<br/>Proofs"]
     end
 
     subgraph foundation["Foundation Layer"]
@@ -133,4 +133,3 @@ No prior knowledge of zero-knowledge proofs or Cardano is required. This guide e
 ---
 
 **Next Chapter**: [01-architecture](./01-architecture.md) - Overall Architecture
-

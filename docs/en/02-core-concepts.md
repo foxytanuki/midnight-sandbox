@@ -163,12 +163,13 @@ flowchart TB
 ```compact
 // Example: counter.compact
 
-pragma midnight 0.3.0;
+pragma language_version >= 0.20;
+import CompactStandardLibrary;
 
 // Public state: On-chain, readable by anyone
 ledger {
-    total_count: Unsigned Integer;
-    public_message: Bytes;
+    total_count: Uint<128>;
+    public_message: Bytes<32>;
 }
 
 // Private state is handled implicitly in witness functions
@@ -317,4 +318,3 @@ flowchart LR
 ---
 
 **Next Chapter**: [03-compact-language](./03-compact-language.md) - Compact Language Guide
-

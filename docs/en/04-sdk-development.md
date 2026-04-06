@@ -19,9 +19,10 @@ pnpm add @midnight-ntwrk/midnight-js-level-private-state-provider@latest
 pnpm add @midnight-ntwrk/midnight-js-fetch-zk-config-provider@latest
 
 # Wallet integration
-pnpm add @midnight-ntwrk/wallet@latest
 pnpm add @midnight-ntwrk/dapp-connector-api@latest
 ```
+
+For wallet SDK internals such as HD derivation, address formatting, or balance management, pick the specific `@midnight-ntwrk/wallet-sdk-*` packages you need from the wallet monorepo rather than assuming a single `@midnight-ntwrk/wallet` package.
 
 ### Project Structure
 
@@ -29,10 +30,13 @@ pnpm add @midnight-ntwrk/dapp-connector-api@latest
 my-dapp/
 ├── contracts/
 │   ├── counter.compact          # Compact source code
-│   └── build/
-│       ├── counter.js           # Compiled runtime
-│       ├── counter.d.ts         # Type definitions
-│       └── keys/                # ZK keys
+│   └── managed/
+│       └── counter/
+│           ├── contract/
+│           │   ├── index.cjs    # Compiled runtime
+│           │   └── index.d.cts  # Type definitions
+│           ├── zkir/
+│           └── keys/
 ├── src/
 │   ├── providers/               # Provider configuration
 │   ├── witnesses/               # Witness implementation
@@ -48,7 +52,7 @@ my-dapp/
 graph TB
     subgraph dapp["Your dApp"]
         contract_api["Contract API<br/>(Generated from Compact)"]
-        contracts["@midnight-ntwrk/midnight-js-contracts<br/>deployContract / findContract / callTx"]
+        contracts["@midnight-ntwrk/midnight-js-contracts<br/>deployContract / findDeployedContract / call / submitCallTx"]
         
         subgraph providers["Providers"]
             pub["PublicData<br/>(Indexer)"]
@@ -73,23 +77,21 @@ graph TB
 
 ```typescript
 // src/providers/index.ts
+import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
 import { 
-  createIndexerPublicDataProvider 
-} from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
-import { 
-  createHttpClientProofProvider 
+  httpClientProofProvider 
 } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
 import { 
-  createLevelPrivateStateProvider 
+  levelPrivateStateProvider 
 } from '@midnight-ntwrk/midnight-js-level-private-state-provider';
 import { 
-  createFetchZkConfigProvider 
+  FetchZkConfigProvider 
 } from '@midnight-ntwrk/midnight-js-fetch-zk-config-provider';
 import type { 
   PublicDataProvider,
   ProofProvider,
   PrivateStateProvider,
-  ZkConfigProvider 
+  ZKConfigProvider 
 } from '@midnight-ntwrk/midnight-js-types';
 
 // Environment configuration
@@ -103,7 +105,7 @@ const config = {
 
 // PublicDataProvider: Read on-chain state
 export const createPublicDataProvider = (): PublicDataProvider => {
-  return createIndexerPublicDataProvider({
+  return indexerPublicDataProvider({
     httpUri: config.indexerUrl,
     wsUri: config.indexerWsUrl,
   });
@@ -111,23 +113,21 @@ export const createPublicDataProvider = (): PublicDataProvider => {
 
 // ProofProvider: Generate ZK proofs
 export const createProofProvider = (): ProofProvider => {
-  return createHttpClientProofProvider({
+  return httpClientProofProvider({
     serverUrl: config.proofServerUrl,
   });
 };
 
 // PrivateStateProvider: Persist private state
 export const createPrivateStateProvider = <T>(): PrivateStateProvider<T> => {
-  return createLevelPrivateStateProvider({
+  return levelPrivateStateProvider({
     path: config.privateStatePath,
   });
 };
 
-// ZkConfigProvider: Get ZK artifacts
-export const createZkConfigProvider = (): ZkConfigProvider => {
-  return createFetchZkConfigProvider({
-    baseUrl: config.zkConfigBaseUrl,
-  });
+// ZKConfigProvider: Get ZK artifacts
+export const createZkConfigProvider = (): ZKConfigProvider => {
+  return new FetchZkConfigProvider(config.zkConfigBaseUrl);
 };
 ```
 
@@ -138,8 +138,8 @@ export const createZkConfigProvider = (): ZkConfigProvider => {
 ```typescript
 // src/contracts/counter.ts
 import { deployContract } from '@midnight-ntwrk/midnight-js-contracts';
-import { Contract, Witnesses, Ledger } from '../../contracts/build/counter';
-import counterRuntime from '../../contracts/build/counter';
+import { Contract, Witnesses, Ledger } from '../../contracts/managed/counter/contract';
+import counterRuntime from '../../contracts/managed/counter/contract';
 import { witnesses } from '../witnesses/counter';
 import { 
   createPublicDataProvider,
@@ -199,8 +199,8 @@ export async function deployCounterContract() {
 
 ```typescript
 // src/contracts/connect.ts
-import { findContract } from '@midnight-ntwrk/midnight-js-contracts';
-import counterRuntime from '../../contracts/build/counter';
+import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
+import counterRuntime from '../../contracts/managed/counter/contract';
 import { witnesses } from '../witnesses/counter';
 
 export async function connectToContract(contractAddress: string) {
@@ -209,7 +209,7 @@ export async function connectToContract(contractAddress: string) {
   const privateStateProvider = createPrivateStateProvider<CounterPrivateState>();
   const zkConfigProvider = createZkConfigProvider();
 
-  const contract = await findContract({
+  const contract = await findDeployedContract({
     runtime: counterRuntime,
     witnesses,
     publicDataProvider,
@@ -228,31 +228,26 @@ export async function connectToContract(contractAddress: string) {
 
 ```typescript
 // src/contracts/operations.ts
-import { callTx } from '@midnight-ntwrk/midnight-js-contracts';
+import { call, submitCallTx } from '@midnight-ntwrk/midnight-js-contracts';
 
 export async function incrementCounter(contract: Contract) {
-  // Call circuit
-  const result = await callTx(contract, 'increment', {
+  const tx = await call(contract, 'increment', {
     // Pass arguments here if any
   });
 
-  console.log('Transaction submitted:', result.txHash);
-  console.log('New ledger state:', result.ledger);
-  
-  return result;
+  return submitCallTx(tx);
 }
 
 export async function addToCounter(contract: Contract, value: bigint) {
-  const result = await callTx(contract, 'add', {
+  const tx = await call(contract, 'add', {
     value,
   });
 
-  return result;
+  return submitCallTx(tx);
 }
 
 export async function getCurrentCount(contract: Contract): Promise<bigint> {
-  // Read-only circuit
-  const result = await callTx(contract, 'get_count', {});
+  const result = await call(contract, 'get_count', {});
   return result.returnValue as bigint;
 }
 ```
@@ -263,7 +258,7 @@ export async function getCurrentCount(contract: Contract): Promise<bigint> {
 
 ```typescript
 // src/witnesses/counter.ts
-import type { Witnesses, WitnessContext } from '../../contracts/build/counter';
+import type { Witnesses, WitnessContext } from '../../contracts/managed/counter/contract';
 
 type CounterPrivateState = {
   localCount: bigint;
@@ -324,74 +319,19 @@ export async function createWitnessesWithAsyncData(userId: string) {
 
 ### DApp Connector API
 
-```typescript
-// src/wallet/connector.ts
-import { 
-  DAppConnector, 
-  type WalletAPI 
-} from '@midnight-ntwrk/dapp-connector-api';
+The connector API is still evolving. To avoid stale examples, keep integration guidance high level:
 
-let walletApi: WalletAPI | null = null;
+- detect a compatible wallet
+- request user approval to connect
+- read the selected account/session data from the wallet
+- hand signed transactions back to the wallet for submission
 
-export async function connectWallet(): Promise<WalletAPI> {
-  // Detect wallet extension
-  const connector = new DAppConnector();
-  
-  // Get available wallets
-  const wallets = await connector.getAvailableWallets();
-  
-  if (wallets.length === 0) {
-    throw new Error('No Midnight wallet found. Please install a compatible wallet.');
-  }
-  
-  // Connect to first wallet
-  walletApi = await connector.connect(wallets[0].id);
-  
-  console.log('Connected to wallet:', wallets[0].name);
-  
-  return walletApi;
-}
-
-export async function getWalletAddress(): Promise<string> {
-  if (!walletApi) {
-    throw new Error('Wallet not connected');
-  }
-  
-  const addresses = await walletApi.getAddresses();
-  return addresses[0];
-}
-
-export async function signAndSubmitTransaction(tx: unknown): Promise<string> {
-  if (!walletApi) {
-    throw new Error('Wallet not connected');
-  }
-  
-  // Balance adjustment and signing with wallet
-  const signedTx = await walletApi.balanceAndSign(tx);
-  
-  // Submit transaction
-  const txHash = await walletApi.submitTransaction(signedTx);
-  
-  return txHash;
-}
-```
+If you need code samples, copy them from the current wallet/connector package docs instead of hard-coding method names here.
 
 ### NodeProvider Integration
 
-```typescript
-// src/providers/node.ts
-import { createNodeProvider } from '@midnight-ntwrk/midnight-js-types';
-
-export function createNodeProviderWithWallet(walletApi: WalletAPI) {
-  return createNodeProvider({
-    // Submit transaction via wallet
-    submitTransaction: async (tx) => {
-      const signedTx = await walletApi.balanceAndSign(tx);
-      return walletApi.submitTransaction(signedTx);
-    },
-  });
-}
-```
+Use the wallet SDK to submit signed transactions through the wallet's own connector/session flow.
+The exact helper names depend on the current wallet package version, so avoid hard-coding them here.
 
 ## State Subscription
 
@@ -447,7 +387,7 @@ export async function watchNewBlocks(onBlock: (block: Block) => void) {
 ```typescript
 // src/hooks/useContract.ts
 import { useState, useEffect, useCallback } from 'react';
-import { Contract, Ledger } from '../../contracts/build/counter';
+import { Contract, Ledger } from '../../contracts/managed/counter/contract';
 import { connectToContract, incrementCounter } from '../contracts/counter';
 
 export function useCounterContract(contractAddress: string) {
@@ -645,4 +585,3 @@ describe('Counter Contract Integration', () => {
 ---
 
 **Next Chapter**: [05-infrastructure](./05-infrastructure.md) - Infrastructure Guide
-

@@ -119,10 +119,11 @@ pub struct CounterAccount {
 
 **Compact (Midnight):**
 ```compact
-pragma midnight 0.3.0;
+pragma language_version >= 0.20;
+import CompactStandardLibrary;
 
 ledger {
-    count: Unsigned Integer;
+    count: Uint<128>;
 }
 
 export circuit increment(): [] {
@@ -134,7 +135,7 @@ export circuit decrement(): [] {
     ledger.count = ledger.count - 1;
 }
 
-export circuit get_count(): Unsigned Integer {
+export circuit get_count(): Uint<128> {
     return ledger.count;
 }
 ```
@@ -156,19 +157,20 @@ contract Token {
 
 **Midnight: プライバシー付き**
 ```compact
-pragma midnight 0.3.0;
+pragma language_version >= 0.20;
+import CompactStandardLibrary;
 
 ledger {
     // 総供給量のみ公開
-    total_supply: Unsigned Integer;
+    total_supply: Uint<128>;
     // 残高はプライベートに管理
 }
 
-witness get_my_balance(): Unsigned Integer;
+witness get_my_balance(): Uint<128>;
 witness update_balance(delta: Integer): [];
-witness get_recipient_key(): Bytes;
+witness get_recipient_key(): Bytes<32>;
 
-export circuit transfer(amount: Unsigned Integer): [] {
+export circuit transfer(amount: Uint<128>): [] {
     // プライベートに残高を確認
     let my_balance = get_my_balance();
     assert my_balance >= amount;
@@ -202,10 +204,10 @@ contract Owned {
 **Compact:**
 ```compact
 ledger {
-    owner_hash: Bytes;  // オーナーの公開鍵ハッシュ
+    owner_hash: Bytes<32>;  // オーナーの公開鍵ハッシュ
 }
 
-witness get_caller_hash(): Bytes;
+witness get_caller_hash(): Bytes<32>;
 
 circuit check_owner(): [] {
     let caller = get_caller_hash();
@@ -293,7 +295,7 @@ export circuit admin_function(): [] {
 | `modifier` | 共通ロジックを circuit に分離 |
 | `event Log(...)` | `log(...)` 関数 |
 | `payable` | Zswap Effects |
-| `mapping(address => uint)` | `Map<Bytes, Unsigned Integer>` |
+| `mapping(address => uint)` | `Map<Bytes<32>, Uint<128>>` |
 | `ERC-20 transfer` | Zswap + witness |
 | `Ownable` | `ledger.owner` + witness 検証 |
 
@@ -316,11 +318,11 @@ export circuit admin_function(): [] {
 ```compact
 // パブリック状態 = 誰でも読める
 ledger {
-    public_counter: Unsigned Integer;  // 公開
+    public_counter: Uint<128>;  // 公開
 }
 
 // プライベート = witness + ローカルストレージ
-witness get_private_data(): Bytes;  // 本人のみ
+witness get_private_data(): Bytes<32>;  // 本人のみ
 ```
 
 ### 2. 証明生成のコスト
@@ -397,4 +399,3 @@ Midnight: 証明のサイズは入力サイズに関係なく固定
 ---
 
 **次章**: [07-resources](./07-resources.md) - リソースと次のステップ
-

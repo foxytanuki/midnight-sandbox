@@ -163,12 +163,13 @@ flowchart TB
 ```compact
 // counter.compact の例
 
-pragma midnight 0.3.0;
+pragma language_version >= 0.20;
+import CompactStandardLibrary;
 
 // パブリック状態: オンチェーン、誰でも読める
 ledger {
-    total_count: Unsigned Integer;
-    public_message: Bytes;
+    total_count: Uint<128>;
+    public_message: Bytes<32>;
 }
 
 // プライベート状態は witness 関数内で暗黙的に扱う
@@ -317,4 +318,3 @@ flowchart LR
 ---
 
 **次章**: [03-compact-language](./03-compact-language.md) - Compact 言語ガイド
-

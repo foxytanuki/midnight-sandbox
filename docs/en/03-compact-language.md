@@ -18,32 +18,31 @@ Compact is a smart contract language designed specifically for Midnight. It prio
 
 ```compact
 // counter.compact
-pragma midnight 0.3.0;
+pragma language_version >= 0.20;
+import CompactStandardLibrary;
 
 // On-chain state (public to all participants)
-ledger {
-  count: Unsigned Integer;
-}
+export ledger count: Counter;
 
 // Increment count by 1
 export circuit increment(): [] {
-  ledger.count = ledger.count + 1;
+  count.increment(1);
 }
 
 // Decrement count by 1
 export circuit decrement(): [] {
-  assert ledger.count > 0;
-  ledger.count = ledger.count - 1;
+  assert(count >= 0);
+  count.decrement(1);
 }
 
 // Get current count
-export circuit get_count(): Unsigned Integer {
-  return ledger.count;
+export circuit get_count(): Uint<128> {
+  return count as Uint<128>;
 }
 
 // Add specified value
-export circuit add(value: Unsigned Integer): [] {
-  ledger.count = ledger.count + value;
+export circuit add(value: Uint<128>): [] {
+  count.increment(value as Field);
 }
 ```
 
@@ -54,7 +53,8 @@ export circuit add(value: Unsigned Integer): [] {
 Version specification. Important for compatibility.
 
 ```compact
-pragma midnight 0.3.0;
+pragma language_version >= 0.20;
+import CompactStandardLibrary;
 ```
 
 #### ledger Block
@@ -64,13 +64,13 @@ Defines **public state**. Stored on-chain and readable by anyone.
 ```compact
 ledger {
   // Simple value
-  counter: Unsigned Integer;
+  counter: Uint<128>;
   
   // Mapping
-  balances: Map<Bytes, Unsigned Integer>;
+  balances: Map<Bytes<32>, Uint<128>>;
   
   // Optional value
-  owner: Optional<Bytes>;
+  owner: Maybe<Bytes<32>>;
 }
 ```
 
@@ -79,7 +79,7 @@ ledger {
 // Equivalent to Solidity storage variables
 contract Counter {
     uint256 public counter;           // ledger { counter: ... }
-    mapping(address => uint256) balances; // Map<Bytes, Unsigned Integer>
+    mapping(address => uint256) balances; // Map<Bytes<32>, Uint<128>>
 }
 ```
 
@@ -94,7 +94,7 @@ export circuit public_function(): [] {
 }
 
 // Internal only (callable from other circuits)
-circuit internal_helper(): Unsigned Integer {
+circuit internal_helper(): Uint<128> {
   return 42;
 }
 ```
@@ -112,26 +112,25 @@ function _internalHelper() internal { ... } // circuit (no export)
 
 | Compact | Description | Solidity Equivalent |
 |---------|-------------|---------------------|
-| `Unsigned Integer` | Unsigned integer (u128) | `uint256` |
-| `Integer` | Signed integer | `int256` |
+| `Uint<N>` | Unsigned integer with N bits | `uint256` |
 | `Boolean` | Boolean value | `bool` |
-| `Bytes` | Byte array | `bytes` |
+| `Bytes<N>` | Fixed-size byte array | `bytesN` |
 | `Field` | Finite field element | None (ZK-specific) |
 
 ### Composite Types
 
 ```compact
 // Mapping
-balances: Map<Bytes, Unsigned Integer>;
+balances: Map<Bytes<32>, Uint<128>>;
 
 // Option
-maybe_value: Optional<Unsigned Integer>;
+maybe_value: Maybe<Uint<128>>;
 
 // Tuple
-pair: (Unsigned Integer, Bytes);
+pair: (Uint<128>, Bytes<32>);
 
 // Array
-items: Vector<Unsigned Integer>;
+items: Vector<4, Uint<128>>;
 ```
 
 ### Structures
@@ -139,13 +138,13 @@ items: Vector<Unsigned Integer>;
 ```compact
 // Structure definition
 struct User {
-  address: Bytes;
-  balance: Unsigned Integer;
+  address: Bytes<32>;
+  balance: Uint<128>;
   is_active: Boolean;
 }
 
 ledger {
-  users: Map<Bytes, User>;
+  users: Map<Bytes<32>, User>;
 }
 ```
 
@@ -157,10 +156,10 @@ ledger {
 
 ```compact
 // Declare witness that handles private state
-witness get_my_secret_balance(address: Bytes): Unsigned Integer;
+witness get_my_secret_balance(address: Bytes<32>): Uint<128>;
 
 export circuit prove_sufficient_balance(
-  required: Unsigned Integer
+  required: Uint<128>
 ): Boolean {
   // Call witness (private computation)
   let my_balance = get_my_secret_balance(/* caller's address */);
@@ -216,24 +215,25 @@ flowchart TB
 
 ```compact
 // voting.compact
-pragma midnight 0.3.0;
+pragma language_version >= 0.20;
+import CompactStandardLibrary;
 
 // Public state
 ledger {
   // Voting results (only aggregates public)
-  yes_votes: Unsigned Integer;
-  no_votes: Unsigned Integer;
+  yes_votes: Uint<128>;
+  no_votes: Uint<128>;
   
   // Voted marker (hashed address)
-  voted: Map<Bytes, Boolean>;
+  voted: Map<Bytes<32>, Boolean>;
   
   // Voting period
   voting_open: Boolean;
 }
 
 // Private computation
-witness get_voter_credentials(): (Bytes, Boolean);  // (voter_hash, vote)
-witness record_vote(voter_hash: Bytes, vote: Boolean): [];
+witness get_voter_credentials(): (Bytes<32>, Boolean);  // (voter_hash, vote)
+witness record_vote(voter_hash: Bytes<32>, vote: Boolean): [];
 
 export circuit cast_vote(): [] {
   assert ledger.voting_open;
@@ -279,11 +279,14 @@ compact compile voting.compact ./build
 
 ```
 build/
-├── voting.js           # Contract runtime
-├── voting.d.ts         # TypeScript type definitions
-├── voting.zkir         # ZK intermediate representation
-├── voting.prover.key   # Proof generation key
-└── voting.verifier.key # Proof verification key
+├── contract/
+│   ├── index.cjs       # Contract runtime
+│   └── index.d.cts     # TypeScript type definitions
+├── zkir/
+│   └── *.zkir          # ZK intermediate representation
+└── keys/
+    ├── *.prover        # Proof generation key
+    └── *.verifier      # Proof verification key
 ```
 
 ### Generated Type Definitions (Example)
@@ -335,7 +338,7 @@ modifier onlyOwner() {
 
 **Compact:**
 ```compact
-witness get_caller_hash(): Bytes;
+witness get_caller_hash(): Bytes<32>;
 
 circuit check_owner(): [] {
   let caller = get_caller_hash();
@@ -371,11 +374,11 @@ function transfer(address to, uint256 amount) public {
 
 ```compact
 // ✗ Avoid: Unnecessary privatization
-witness get_public_data(): Unsigned Integer;
+witness get_public_data(): Uint<128>;
 
 // ✓ Recommended: Private only when needed
 // Access public state directly with ledger
-export circuit read_public(): Unsigned Integer {
+export circuit read_public(): Uint<128> {
   return ledger.public_counter;
 }
 ```
@@ -391,7 +394,7 @@ circuit process_all(): [] {
 }
 
 // ✓ Recommended: Split batch processing
-export circuit process_batch(start: Unsigned Integer, count: Unsigned Integer): [] {
+export circuit process_batch(start: Uint<128>, count: Uint<128>): [] {
   assert count <= 10;
   // Process in small batches
 }
@@ -400,7 +403,7 @@ export circuit process_batch(start: Unsigned Integer, count: Unsigned Integer): 
 ### 3. Use Assertions
 
 ```compact
-export circuit safe_divide(a: Unsigned Integer, b: Unsigned Integer): Unsigned Integer {
+export circuit safe_divide(a: Uint<128>, b: Uint<128>): Uint<128> {
   // Prevent division by zero
   assert b > 0;
   return a / b;
@@ -425,4 +428,3 @@ compact compile contract.compact ./build
 ---
 
 **Next Chapter**: [04-sdk-development](./04-sdk-development.md) - dApp Development with midnight-js
-

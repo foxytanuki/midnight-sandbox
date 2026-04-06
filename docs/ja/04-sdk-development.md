@@ -19,9 +19,10 @@ pnpm add @midnight-ntwrk/midnight-js-level-private-state-provider@latest
 pnpm add @midnight-ntwrk/midnight-js-fetch-zk-config-provider@latest
 
 # ウォレット連携
-pnpm add @midnight-ntwrk/wallet@latest
 pnpm add @midnight-ntwrk/dapp-connector-api@latest
 ```
+
+HD 導出、アドレス形式、残高管理などの低レベルなウォレット機能が必要な場合は、単一の `@midnight-ntwrk/wallet` を前提にせず、wallet monorepo の `@midnight-ntwrk/wallet-sdk-*` パッケージから必要なものを選びます。
 
 ### プロジェクト構造
 
@@ -29,10 +30,13 @@ pnpm add @midnight-ntwrk/dapp-connector-api@latest
 my-dapp/
 ├── contracts/
 │   ├── counter.compact          # Compact ソースコード
-│   └── build/
-│       ├── counter.js           # コンパイル済みランタイム
-│       ├── counter.d.ts         # 型定義
-│       └── keys/                # ZK キー
+│   └── managed/
+│       └── counter/
+│           ├── contract/
+│           │   ├── index.cjs    # コンパイル済みランタイム
+│           │   └── index.d.cts  # 型定義
+│           ├── zkir/
+│           └── keys/
 ├── src/
 │   ├── providers/               # プロバイダー設定
 │   ├── witnesses/               # witness 実装
@@ -48,7 +52,7 @@ my-dapp/
 graph TB
     subgraph dapp["Your dApp"]
         contract_api["Contract API<br/>(Compact から生成)"]
-        contracts["@midnight-ntwrk/midnight-js-contracts<br/>deployContract / findContract / callTx"]
+        contracts["@midnight-ntwrk/midnight-js-contracts<br/>deployContract / findDeployedContract / call / submitCallTx"]
         
         subgraph providers["Providers"]
             pub["PublicData<br/>(Indexer)"]
@@ -73,23 +77,15 @@ graph TB
 
 ```typescript
 // src/providers/index.ts
-import { 
-  createIndexerPublicDataProvider 
-} from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
-import { 
-  createHttpClientProofProvider 
-} from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
-import { 
-  createLevelPrivateStateProvider 
-} from '@midnight-ntwrk/midnight-js-level-private-state-provider';
-import { 
-  createFetchZkConfigProvider 
-} from '@midnight-ntwrk/midnight-js-fetch-zk-config-provider';
+import { indexerPublicDataProvider } from '@midnight-ntwrk/midnight-js-indexer-public-data-provider';
+import { httpClientProofProvider } from '@midnight-ntwrk/midnight-js-http-client-proof-provider';
+import { levelPrivateStateProvider } from '@midnight-ntwrk/midnight-js-level-private-state-provider';
+import { FetchZkConfigProvider } from '@midnight-ntwrk/midnight-js-fetch-zk-config-provider';
 import type { 
   PublicDataProvider,
   ProofProvider,
   PrivateStateProvider,
-  ZkConfigProvider 
+  ZKConfigProvider 
 } from '@midnight-ntwrk/midnight-js-types';
 
 // 環境設定
@@ -103,7 +99,7 @@ const config = {
 
 // PublicDataProvider: オンチェーン状態の読み取り
 export const createPublicDataProvider = (): PublicDataProvider => {
-  return createIndexerPublicDataProvider({
+  return indexerPublicDataProvider({
     httpUri: config.indexerUrl,
     wsUri: config.indexerWsUrl,
   });
@@ -111,23 +107,21 @@ export const createPublicDataProvider = (): PublicDataProvider => {
 
 // ProofProvider: ZK証明の生成
 export const createProofProvider = (): ProofProvider => {
-  return createHttpClientProofProvider({
+  return httpClientProofProvider({
     serverUrl: config.proofServerUrl,
   });
 };
 
 // PrivateStateProvider: プライベート状態の永続化
 export const createPrivateStateProvider = <T>(): PrivateStateProvider<T> => {
-  return createLevelPrivateStateProvider({
+  return levelPrivateStateProvider({
     path: config.privateStatePath,
   });
 };
 
-// ZkConfigProvider: ZKアーティファクトの取得
-export const createZkConfigProvider = (): ZkConfigProvider => {
-  return createFetchZkConfigProvider({
-    baseUrl: config.zkConfigBaseUrl,
-  });
+// ZKConfigProvider: ZKアーティファクトの取得
+export const createZkConfigProvider = (): ZKConfigProvider => {
+  return new FetchZkConfigProvider(config.zkConfigBaseUrl);
 };
 ```
 
@@ -138,8 +132,8 @@ export const createZkConfigProvider = (): ZkConfigProvider => {
 ```typescript
 // src/contracts/counter.ts
 import { deployContract } from '@midnight-ntwrk/midnight-js-contracts';
-import { Contract, Witnesses, Ledger } from '../../contracts/build/counter';
-import counterRuntime from '../../contracts/build/counter';
+import { Contract, Witnesses, Ledger } from '../../contracts/managed/counter/contract';
+import counterRuntime from '../../contracts/managed/counter/contract';
 import { witnesses } from '../witnesses/counter';
 import { 
   createPublicDataProvider,
@@ -199,8 +193,8 @@ export async function deployCounterContract() {
 
 ```typescript
 // src/contracts/connect.ts
-import { findContract } from '@midnight-ntwrk/midnight-js-contracts';
-import counterRuntime from '../../contracts/build/counter';
+import { findDeployedContract } from '@midnight-ntwrk/midnight-js-contracts';
+import counterRuntime from '../../contracts/managed/counter/contract';
 import { witnesses } from '../witnesses/counter';
 
 export async function connectToContract(contractAddress: string) {
@@ -209,7 +203,7 @@ export async function connectToContract(contractAddress: string) {
   const privateStateProvider = createPrivateStateProvider<CounterPrivateState>();
   const zkConfigProvider = createZkConfigProvider();
 
-  const contract = await findContract({
+  const contract = await findDeployedContract({
     runtime: counterRuntime,
     witnesses,
     publicDataProvider,
@@ -228,31 +222,28 @@ export async function connectToContract(contractAddress: string) {
 
 ```typescript
 // src/contracts/operations.ts
-import { callTx } from '@midnight-ntwrk/midnight-js-contracts';
+import { call, submitCallTx } from '@midnight-ntwrk/midnight-js-contracts';
 
 export async function incrementCounter(contract: Contract) {
   // circuit を呼び出し
-  const result = await callTx(contract, 'increment', {
+  const tx = await call(contract, 'increment', {
     // 引数がある場合はここで渡す
   });
 
-  console.log('Transaction submitted:', result.txHash);
-  console.log('New ledger state:', result.ledger);
-  
-  return result;
+  return submitCallTx(tx);
 }
 
 export async function addToCounter(contract: Contract, value: bigint) {
-  const result = await callTx(contract, 'add', {
+  const tx = await call(contract, 'add', {
     value,
   });
 
-  return result;
+  return submitCallTx(tx);
 }
 
 export async function getCurrentCount(contract: Contract): Promise<bigint> {
   // 読み取り専用の circuit
-  const result = await callTx(contract, 'get_count', {});
+  const result = await call(contract, 'get_count', {});
   return result.returnValue as bigint;
 }
 ```
@@ -263,7 +254,7 @@ export async function getCurrentCount(contract: Contract): Promise<bigint> {
 
 ```typescript
 // src/witnesses/counter.ts
-import type { Witnesses, WitnessContext } from '../../contracts/build/counter';
+import type { Witnesses, WitnessContext } from '../../contracts/managed/counter/contract';
 
 type CounterPrivateState = {
   localCount: bigint;
@@ -322,76 +313,13 @@ export async function createWitnessesWithAsyncData(userId: string) {
 
 ## ウォレット連携
 
-### DApp Connector API
+Midnight のウォレット連携は、各ウォレットの公開 API に合わせて実装します。特定のコネクタ実装名やメソッド名を固定せず、アプリ側では次を押さえます。
 
-```typescript
-// src/wallet/connector.ts
-import { 
-  DAppConnector, 
-  type WalletAPI 
-} from '@midnight-ntwrk/dapp-connector-api';
+- ウォレット選択 UI を用意する
+- 接続後にアドレスと署名結果を受け取る
+- 署名済みトランザクションを dApp 側で送信する
 
-let walletApi: WalletAPI | null = null;
-
-export async function connectWallet(): Promise<WalletAPI> {
-  // ウォレット拡張を検出
-  const connector = new DAppConnector();
-  
-  // 利用可能なウォレットを取得
-  const wallets = await connector.getAvailableWallets();
-  
-  if (wallets.length === 0) {
-    throw new Error('No Midnight wallet found. Please install a compatible wallet.');
-  }
-  
-  // 最初のウォレットに接続
-  walletApi = await connector.connect(wallets[0].id);
-  
-  console.log('Connected to wallet:', wallets[0].name);
-  
-  return walletApi;
-}
-
-export async function getWalletAddress(): Promise<string> {
-  if (!walletApi) {
-    throw new Error('Wallet not connected');
-  }
-  
-  const addresses = await walletApi.getAddresses();
-  return addresses[0];
-}
-
-export async function signAndSubmitTransaction(tx: unknown): Promise<string> {
-  if (!walletApi) {
-    throw new Error('Wallet not connected');
-  }
-  
-  // ウォレットでバランス調整と署名
-  const signedTx = await walletApi.balanceAndSign(tx);
-  
-  // トランザクション送信
-  const txHash = await walletApi.submitTransaction(signedTx);
-  
-  return txHash;
-}
-```
-
-### NodeProvider との連携
-
-```typescript
-// src/providers/node.ts
-import { createNodeProvider } from '@midnight-ntwrk/midnight-js-types';
-
-export function createNodeProviderWithWallet(walletApi: WalletAPI) {
-  return createNodeProvider({
-    // ウォレット経由でトランザクション送信
-    submitTransaction: async (tx) => {
-      const signedTx = await walletApi.balanceAndSign(tx);
-      return walletApi.submitTransaction(signedTx);
-    },
-  });
-}
-```
+必要に応じて、対象ウォレットごとの薄いアダプタ層を追加してください。
 
 ## 状態の購読
 
@@ -447,7 +375,7 @@ export async function watchNewBlocks(onBlock: (block: Block) => void) {
 ```typescript
 // src/hooks/useContract.ts
 import { useState, useEffect, useCallback } from 'react';
-import { Contract, Ledger } from '../../contracts/build/counter';
+import { Contract, Ledger } from '../../contracts/managed/counter/contract';
 import { connectToContract, incrementCounter } from '../contracts/counter';
 
 export function useCounterContract(contractAddress: string) {
@@ -645,4 +573,3 @@ describe('Counter Contract Integration', () => {
 ---
 
 **次章**: [05-infrastructure](./05-infrastructure.md) - インフラストラクチャガイド
-

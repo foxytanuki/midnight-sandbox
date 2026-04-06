@@ -89,7 +89,7 @@ block-beta
             block:pallets["Pallets"]
                 columns 3
                 midnight["Midnight System"]
-                native["Native Token Observation"]
+                native["cNIGHT Observation"]
                 federated["Federated Authority"]
             end
         end
@@ -106,7 +106,7 @@ block-beta
 **主要 Pallet:**
 - `pallet-midnight`: コアトランザクション処理、ZK証明検証
 - `pallet-midnight-system`: システムトランザクション管理
-- `pallet-native-token-observation`: Cardano ブリッジ (cNIGHT → DUST)
+- `pallet-cnight-observation`: Cardano ブリッジ (cNIGHT → DUST)
 - `pallet-federated-authority`: 複合ガバナンス
 
 ---
@@ -153,7 +153,7 @@ graph LR
 | コンポーネント | 役割 |
 |---------------|------|
 | `curves` | BLS12-381 / JubJub 楕円曲線実装 |
-| `proof-system` | Plonk 証明システム (KZG ベース) |
+| `proofs` / `midnight-proofs` | Plonk 証明ツール (KZG ベース) |
 | `circuits` | ZK 回路構築ツールキット |
 | `aggregator` | 証明集約 (複数証明の効率的検証) |
 
@@ -286,4 +286,3 @@ flowchart TB
 ---
 
 **次章**: [02-core-concepts](./02-core-concepts.md) - ゼロ知識証明とコア概念
-
