@@ -2,6 +2,8 @@
 
 [Midnight](https://midnight.network/) Hands-on Notes
 
+This project extends the Midnight Network with additional developer tooling.
+
 This repository is a sandbox that consolidates development environments and tools for Midnight Network.
 
 ## Project Structure
@@ -218,6 +220,5 @@ See [rpc/RPC_API.md](./rpc/RPC_API.md) for detailed RPC API reference.
 - [Midnight Network Official Site](https://midnight.network/)
 - [Midnight Network Official Documentation](https://docs.midnight.network/)
 - [Midnight Network GitHub](https://github.com/midnightntwrk)
-
 
 
