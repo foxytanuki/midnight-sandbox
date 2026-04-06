@@ -49,3 +49,6 @@
 [submodule "submodules/midnight-apps"]
 	path = submodules/midnight-apps
 	url = https://github.com/OpenZeppelin/midnight-apps.git
+[submodule "submodules/midnight-local-dev"]
+	path = submodules/midnight-local-dev
+	url = https://github.com/midnightntwrk/midnight-local-dev.git
