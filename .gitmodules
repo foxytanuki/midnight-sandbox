@@ -52,3 +52,6 @@
 [submodule "submodules/midnight-local-dev"]
 	path = submodules/midnight-local-dev
 	url = https://github.com/midnightntwrk/midnight-local-dev.git
+[submodule "submodules/example-zkloan"]
+	path = submodules/example-zkloan
+	url = https://github.com/midnightntwrk/example-zkloan.git
