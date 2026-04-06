@@ -1,6 +1,6 @@
 # 多項式コミットメント — 封筒に入れて封をする
 
-[← 算術回路](./80-02-arithmetic-circuits.md) | [次: Plonk →](./80-04-plonk.md)
+[← 算術回路](./02-arithmetic-circuits.md) | [次: Plonk →](./04-plonk.md)
 
 ## コミットメントとは
 

@@ -1,6 +1,6 @@
 # 算術回路 — 計算を数学に変換する
 
-[← ZKが解く問題](./80-01-problem.md) | [次: 多項式コミットメント →](./80-03-polynomial-commitment.md)
+[← ZKが解く問題](./01-problem.md) | [次: 多項式コミットメント →](./03-polynomial-commitment.md)
 
 ## なぜ回路が必要なのか
 

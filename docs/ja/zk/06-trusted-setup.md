@@ -1,6 +1,6 @@
 # Trusted Setup — 信頼されたセットアップ
 
-[← 楕円曲線 BLS12-381](./80-05-bls12-381.md) | [次: 証明ライフサイクル →](./80-07-proof-lifecycle.md)
+[← 楕円曲線 BLS12-381](./05-bls12-381.md) | [次: 証明ライフサイクル →](./07-proof-lifecycle.md)
 
 ## なぜTrusted Setupが必要か
 

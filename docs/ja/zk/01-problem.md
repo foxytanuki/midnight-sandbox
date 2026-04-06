@@ -1,6 +1,6 @@
 # ZKが解く問題
 
-[← 全体像に戻る](./80-00-zk-overview.md) | [次: 算術回路 →](./80-02-arithmetic-circuits.md)
+[← 全体像に戻る](./00-zk-overview.md) | [次: 算術回路 →](./02-arithmetic-circuits.md)
 
 ## 前提: 計算の検証とは
 

@@ -1,6 +1,6 @@
 # 証明ライフサイクル — Midnightでの全体の流れ
 
-[← Trusted Setup](./80-06-trusted-setup.md) | [全体像に戻る →](./80-00-zk-overview.md)
+[← Trusted Setup](./06-trusted-setup.md) | [全体像に戻る →](./00-zk-overview.md)
 
 ## 概要
 

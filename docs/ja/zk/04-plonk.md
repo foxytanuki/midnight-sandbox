@@ -1,6 +1,6 @@
 # Plonk — 証明システムの具体的な方式
 
-[← 多項式コミットメント](./80-03-polynomial-commitment.md) | [次: 楕円曲線 BLS12-381 →](./80-05-bls12-381.md)
+[← 多項式コミットメント](./03-polynomial-commitment.md) | [次: 楕円曲線 BLS12-381 →](./05-bls12-381.md)
 
 ## Plonkとは
 

@@ -4,13 +4,13 @@
 
 ## 目次
 
-1. [ZKが解く問題](./80-01-problem.md) — なぜZKが必要なのか
-2. [算術回路](./80-02-arithmetic-circuits.md) — 計算を数学に変換する
-3. [多項式コミットメント](./80-03-polynomial-commitment.md) — 封筒に入れて封をする
-4. [Plonk](./80-04-plonk.md) — 証明システムの具体的な方式
-5. [楕円曲線 BLS12-381](./80-05-bls12-381.md) — 暗号の土台
-6. [Trusted Setup](./80-06-trusted-setup.md) — 信頼されたセットアップ
-7. [証明ライフサイクル](./80-07-proof-lifecycle.md) — Midnightでの全体の流れ
+1. [ZKが解く問題](./01-problem.md) — なぜZKが必要なのか
+2. [算術回路](./02-arithmetic-circuits.md) — 計算を数学に変換する
+3. [多項式コミットメント](./03-polynomial-commitment.md) — 封筒に入れて封をする
+4. [Plonk](./04-plonk.md) — 証明システムの具体的な方式
+5. [楕円曲線 BLS12-381](./05-bls12-381.md) — 暗号の土台
+6. [Trusted Setup](./06-trusted-setup.md) — 信頼されたセットアップ
+7. [証明ライフサイクル](./07-proof-lifecycle.md) — Midnightでの全体の流れ
 
 ## 全体像
 
