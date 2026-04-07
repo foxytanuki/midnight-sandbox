@@ -55,3 +55,6 @@
 [submodule "submodules/example-zkloan"]
 	path = submodules/example-zkloan
 	url = https://github.com/midnightntwrk/example-zkloan.git
+[submodule "submodules/midnight-private-payment-demo"]
+	path = submodules/midnight-private-payment-demo
+	url = https://github.com/sition-jp/midnight-private-payment-demo
